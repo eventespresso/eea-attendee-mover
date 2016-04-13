@@ -87,6 +87,28 @@ class EED_Attendee_Mover extends EED_Module {
 
 
 
+	 /**
+	  * displayAttendeeMoverForm
+	  *
+	  * @access    public
+	  * @return    void
+	  */
+	 public function displayAttendeeMoverForm() {
+		 $CollectionLoaderManager = new \EventEspresso\core\services\collection_loaders\CollectionLoaderManager(
+			 new \EventEspresso\core\services\progress_steps\ProgressStepCollection(),
+			 new \EspressoAttendeeMover\core\ProgressStepCollectionDetails()
+		 );
+		 $ProgressStepManager = new \EventEspresso\core\services\progress_steps\ProgressStepManager(
+			 $CollectionLoaderManager->getCollection()
+		 );
+		 $ProgressStepManager->currentStep();
+	 }
+
+
+
+
+
+
 	/**
 	 * 	enqueue_scripts - Load the scripts and css
 	 *
