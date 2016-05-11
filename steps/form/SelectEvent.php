@@ -19,6 +19,12 @@ if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
  * @since         4.9.0
  */
 class SelectEvent implements SequentialStepFormInterface {
+	
+	/**
+	 *
+	 * @var EE_Form_Section_Proper
+	 */
+	protected $form;
 
 
 
@@ -74,6 +80,12 @@ class SelectEvent implements SequentialStepFormInterface {
 	 * @return boolean
 	 */
 	public function initialize() {
+		$form = $this->generate();
+		if( $form instanceof \EE_Form_Section_Proper ) {
+			return true; 
+		} else {
+			return false;
+		}
 	}
 
 
@@ -84,6 +96,7 @@ class SelectEvent implements SequentialStepFormInterface {
 	 * @return void
 	 */
 	public function localizeVariables() {
+		//form variables are localized when calling EE_Form_Section_Base::enqueue_js, which is done during SelectEvent::enqueueStylesAndScripts()
 	}
 
 
@@ -94,6 +107,8 @@ class SelectEvent implements SequentialStepFormInterface {
 	 * @return void
 	 */
 	public function enqueueStylesAndScripts() {
+		$form = $this->generate();
+		$form->enqueue_js();
 	}
 
 
@@ -104,7 +119,25 @@ class SelectEvent implements SequentialStepFormInterface {
 	 * @return EE_Form_Section_Proper
 	 */
 	public function generate() {
-		\EEH_Debug_Tools::printr( __FUNCTION__, __CLASS__, __FILE__, __LINE__, 2 );
+		if( ! $this->form instanceof \EE_Form_Section_Proper ) {
+			$this->form = new \EE_Form_Section_Proper(
+				array(
+					'event' => new \EE_Select_Ajax_Model_Rest_Input(
+						array(
+							'model_name' => 'Event',
+							'display_field_name' => 'EVT_name',
+							'query_params' => array(
+								'caps' => \EEM_Base::caps_read_admin
+							) 
+						)
+					)
+				)
+			);
+		}
+		if( ! $this->form instanceof \EE_Form_Section_Proper ) {
+			throw new \EE_Error( __( 'SelectEvent attendee mover step form cannot be generated', 'event_espresso' ));
+		}
+		return $this->form;
 	}
 
 
@@ -116,7 +149,7 @@ class SelectEvent implements SequentialStepFormInterface {
 	 * @return string
 	 */
 	public function display() {
-		\EEH_Debug_Tools::printr( __FUNCTION__, __CLASS__, __FILE__, __LINE__, 2 );
+		return $this->generate()->get_html();
 	}
 
 
