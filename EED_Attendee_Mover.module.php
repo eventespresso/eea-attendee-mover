@@ -298,10 +298,12 @@ class EED_Attendee_Mover extends EED_Module {
 		try {
 			$progress_steps_collection = EED_Attendee_Mover::get_progress_steps_collection();
 			$this->form_steps = EED_Attendee_Mover::get_form_steps_collection();
+			/** @var SequentialStepFormInterface $form_step */
 			foreach ( $this->form_steps as $form_step ) {
 				$progress_steps_collection->add(
 					new \EventEspresso\core\services\progress_steps\ProgressStep(
 						$form_step->order(),
+						$form_step->slug(),
 						$form_step->slug(),
 						$form_step->formName()
 					),
@@ -313,10 +315,10 @@ class EED_Attendee_Mover extends EED_Module {
 				'select_event',
 				$progress_steps_collection
 			);
-			$this->progress_step_manager->setStep();
+			$this->progress_step_manager->setCurrentStep();
 			$this->progress_step_manager->enqueueStylesAndScripts();
 		} catch ( Exception $e ) {
-			EE_Error::add_error( $e->getMessage(), __FILE__, __FUNCTION__, __LINE__ );
+			// EE_Error::add_error( $e->getMessage(), __FILE__, __FUNCTION__, __LINE__ );
 		}
 	}
 
@@ -376,11 +378,11 @@ class EED_Attendee_Mover extends EED_Module {
 
 
 	public function _edit_ticket_selection_meta_box() {
-		$this->progress_step_manager->displaySteps();
 		$request = \EE_Registry::instance()->load_core( 'Request' );
 		if ( ! $this->form_steps->setCurrent( $request->get( 'ee-step', 'select_event' ) ) ) {
-			EE_Error::add_error( 'BOOM', __FILE__, __FUNCTION__, __LINE__ );
+			throw new \EventEspresso\Core\Exceptions\BaseException( 'Form Step could not be set' );
 		}
+		$this->progress_step_manager->displaySteps();
 		/** @var SequentialStepFormInterface $form_step */
 		$form_step = $this->form_steps->current();
 		echo \EEH_HTML::h1( $form_step->formName() );
