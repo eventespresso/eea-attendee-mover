@@ -268,13 +268,6 @@ class EED_Attendee_Mover extends EED_Module {
 
 
 
-	public static function _edit_ticket_selection() {
-		// the details template wrapper
-		EED_Attendee_Mover::$admin_page->display_admin_page_with_sidebar();
-	}
-
-
-
 	public static function add_edit_ticket_selection_meta_box() {
 		add_meta_box(
 			'edit-ticket-selection-mbox',
@@ -295,28 +288,24 @@ class EED_Attendee_Mover extends EED_Module {
 
 
 	public function _edit_ticket_selections_init() {
+		\EEH_Debug_Tools::printr( __FUNCTION__, __CLASS__, __FILE__, __LINE__, 2 );
 		try {
-			$progress_steps_collection = EED_Attendee_Mover::get_progress_steps_collection();
 			$this->form_steps = EED_Attendee_Mover::get_form_steps_collection();
-			/** @var SequentialStepFormInterface $form_step */
-			foreach ( $this->form_steps as $form_step ) {
-				$progress_steps_collection->add(
-					new \EventEspresso\core\services\progress_steps\ProgressStep(
-						$form_step->order(),
-						$form_step->slug(),
-						$form_step->slug(),
-						$form_step->formName()
-					),
-					$form_step->slug()
-				);
-			}
-			$this->progress_step_manager = new \EventEspresso\core\services\progress_steps\ProgressStepManager(
-				'number_bubbles',
-				'select_event',
-				$progress_steps_collection
+			$this->generate_progress_steps(
+				EED_Attendee_Mover::get_progress_steps_collection()
 			);
-			$this->progress_step_manager->setCurrentStep();
+			$request = \EE_Registry::instance()->load_core( 'Request' );
+			$current_step = $request->get( 'ee-step', 'select_event' );
+			if ( ! $this->form_steps->setCurrent( $current_step ) ) {
+				throw new \EventEspresso\Core\Exceptions\BaseException( 'Form Step could not be set' );
+			}
+			$this->progress_step_manager->setCurrentStep( $current_step );
 			$this->progress_step_manager->enqueueStylesAndScripts();
+			/** @var SequentialStepFormInterface $form_step */
+			$form_step = $this->form_steps->current();
+			$form_step->generate();
+			$form_step->enqueueStylesAndScripts();
+			add_action( 'admin_enqueue_scripts', array( 'EED_Attendee_Mover', 'enqueue_scripts' ) );
 		} catch ( Exception $e ) {
 			// EE_Error::add_error( $e->getMessage(), __FILE__, __FUNCTION__, __LINE__ );
 		}
@@ -326,6 +315,7 @@ class EED_Attendee_Mover extends EED_Module {
 
 	/**
 	 * @return \EventEspresso\core\services\collections\Collection|null
+	 * @throws \EventEspresso\Core\Exceptions\InvalidEntityException
 	 * @throws \EventEspresso\Core\Exceptions\InvalidIdentifierException
 	 * @throws \EventEspresso\Core\Exceptions\InvalidInterfaceException
 	 * @throws \EventEspresso\Core\Exceptions\InvalidFilePathException
@@ -371,6 +361,46 @@ class EED_Attendee_Mover extends EED_Module {
 
 
 
+	/**
+	 * @param \EventEspresso\core\services\collections\Collection $progress_steps_collection
+	 * @throws \EventEspresso\Core\Exceptions\InvalidEntityException
+	 * @throws \EventEspresso\Core\Exceptions\InvalidDataTypeException
+	 * @throws \EventEspresso\Core\Exceptions\InvalidClassException
+	 * @throws \EventEspresso\Core\Exceptions\InvalidInterfaceException
+	 */
+	public function generate_progress_steps( \EventEspresso\core\services\collections\Collection $progress_steps_collection ) {
+		/** @var SequentialStepFormInterface $form_step */
+		foreach ( $this->form_steps as $form_step ) {
+			// is this step active ?
+			if ( ! $form_step->initialize() ) {
+				continue;
+			}
+			$progress_steps_collection->add(
+				new \EventEspresso\core\services\progress_steps\ProgressStep(
+					$form_step->order(),
+					$form_step->slug(),
+					$form_step->slug(),
+					$form_step->formName()
+				),
+				$form_step->slug()
+			);
+		}
+		$this->progress_step_manager = new \EventEspresso\core\services\progress_steps\ProgressStepManager(
+			'number_bubbles',
+			'select_event',
+			$progress_steps_collection
+		);
+	}
+
+
+
+	public static function _edit_ticket_selection() {
+		// the details template wrapper
+		EED_Attendee_Mover::$admin_page->display_admin_page_with_sidebar();
+	}
+
+
+
 	public static function edit_ticket_selection_meta_box() {
 		EED_Attendee_Mover::instance()->_edit_ticket_selection_meta_box();
 	}
@@ -378,16 +408,12 @@ class EED_Attendee_Mover extends EED_Module {
 
 
 	public function _edit_ticket_selection_meta_box() {
-		$request = \EE_Registry::instance()->load_core( 'Request' );
-		if ( ! $this->form_steps->setCurrent( $request->get( 'ee-step', 'select_event' ) ) ) {
-			throw new \EventEspresso\Core\Exceptions\BaseException( 'Form Step could not be set' );
-		}
+		\EEH_Debug_Tools::printr( __FUNCTION__, __CLASS__, __FILE__, __LINE__, 2 );
 		$this->progress_step_manager->displaySteps();
 		/** @var SequentialStepFormInterface $form_step */
 		$form_step = $this->form_steps->current();
 		echo \EEH_HTML::h1( $form_step->formName() );
-		$form_step->generate();
-		$form_step->display();
+		echo $form_step->display();
 	}
 
 
@@ -420,7 +446,8 @@ class EED_Attendee_Mover extends EED_Module {
 	 *  @access 	public
 	 *  @return 	void
 	 */
-	public function enqueue_scripts() {
+	public static function enqueue_scripts() {
+		\EEH_Debug_Tools::printr( __FUNCTION__, __CLASS__, __FILE__, __LINE__, 2 );
 		//Check to see if the attendee_mover css file exists in the '/uploads/espresso/' directory
 		if ( is_readable( EVENT_ESPRESSO_UPLOAD_DIR . "css/attendee_mover.css")) {
 			//This is the url to the css file if available
@@ -437,7 +464,6 @@ class EED_Attendee_Mover extends EED_Module {
 			EE_ATTENDEE_MOVER_VERSION,
 			TRUE
 		);
-
 		wp_enqueue_style( 'espresso_attendee_mover' );
 		wp_enqueue_script( 'espresso_attendee_mover' );
 	}
