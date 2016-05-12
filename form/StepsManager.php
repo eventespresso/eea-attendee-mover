@@ -1,10 +1,11 @@
 <?php
-namespace AttendeeMover\steps\form;
+namespace AttendeeMover\form;
 
 use EventEspresso\Core\Exceptions\BaseException;
 use EventEspresso\Core\Exceptions\InvalidClassException;
 use EventEspresso\Core\Exceptions\InvalidDataTypeException;
 use EventEspresso\Core\Exceptions\InvalidEntityException;
+use EventEspresso\Core\Exceptions\InvalidFilePathException;
 use EventEspresso\Core\Exceptions\InvalidIdentifierException;
 use EventEspresso\Core\Exceptions\InvalidInterfaceException;
 use EventEspresso\core\libraries\form_sections\SequentialStepFormManager;
@@ -84,7 +85,7 @@ class StepsManager extends SequentialStepFormManager {
 	 * @throws InvalidEntityException
 	 * @throws InvalidIdentifierException
 	 * @throws InvalidInterfaceException
-	 * @throws \EventEspresso\Core\Exceptions\InvalidFilePathException
+	 * @throws InvalidFilePathException
 	 * @throws InvalidDataTypeException
 	 * @throws InvalidClassException
 	 */
@@ -96,9 +97,9 @@ class StepsManager extends SequentialStepFormManager {
 					'attendee_mover_form_steps',
 					'\EventEspresso\core\libraries\form_sections\SequentialStepFormInterface',
 					array(
-						'\AttendeeMover\steps\form\SelectEvent',
-						'\AttendeeMover\steps\form\SelectTicket',
-						'\AttendeeMover\steps\form\VerifyChanges',
+						'\AttendeeMover\form\SelectEvent',
+						'\AttendeeMover\form\SelectTicket',
+						'\AttendeeMover\form\VerifyChanges',
 					),
 					array(),
 					'',
