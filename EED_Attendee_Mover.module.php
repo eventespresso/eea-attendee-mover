@@ -1,4 +1,4 @@
-<?php use EventEspresso\core\libraries\form_sections\SequentialStepFormInterface;
+<?php
 
 if ( ! defined( 'EVENT_ESPRESSO_VERSION')) { exit('No direct script access allowed'); }
 /**
@@ -17,16 +17,6 @@ class EED_Attendee_Mover extends EED_Module {
 	 * @var \Registrations_Admin_Page $admin_page
 	 */
 	protected static $admin_page;
-
-	/**
-	 * @var \EventEspresso\core\services\collections\Collection $form_steps
-	 */
-	protected $form_steps;
-
-	/**
-	 * @var \EventEspresso\core\services\progress_steps\ProgressStepManager $progress_step_manager
-	 */
-	protected $progress_step_manager;
 
 
 	/**
@@ -58,17 +48,17 @@ class EED_Attendee_Mover extends EED_Module {
 	 public static function set_hooks_admin() {
 		 EE_Psr4AutoloaderInit::psr4_loader()->addNamespace( 'AttendeeMover', __DIR__ );
 		 add_action(
-			 'FHEE__EE_Admin_Page___load_page_dependencies__after_load__espresso_registrations__edit_ticket_selection',
-			 array( 'EED_Attendee_Mover', 'edit_ticket_selections_init' )
+			 'FHEE__EE_Admin_Page___load_page_dependencies__after_load__espresso_registrations__edit_attendee_selections',
+			 array( 'EED_Attendee_Mover', 'edit_attendee_selections_init' )
 		 );
 		 add_filter(
 			 'FHEE__EE_Registrations_List_Table__column_actions__actions',
-		      array( 'EED_Attendee_Mover', 'edit_ticket_selection_button_reg_list' ),
+		      array( 'EED_Attendee_Mover', 'edit_attendee_selections_button_reg_list' ),
 			 10, 2
 		 );
 		 add_action(
 			 'AHEE__reg_admin_details_main_meta_box_reg_details__top',
-		      array( 'EED_Attendee_Mover', 'edit_ticket_selection_button' ),
+		      array( 'EED_Attendee_Mover', 'edit_attendee_selections_button' ),
 			 10, 1
 		 );
 		 add_filter(
@@ -142,21 +132,32 @@ class EED_Attendee_Mover extends EED_Module {
 			EED_Attendee_Mover::$admin_page = $admin_page;
 		}
 		$req_data = $admin_page->get_request_data();
-		$reg_id = ! empty( $req_data['_REG_ID'] ) && ! is_array( $req_data['_REG_ID'] )
+		$REG_ID = ! empty( $req_data['_REG_ID'] ) && ! is_array( $req_data['_REG_ID'] )
 			? $req_data['_REG_ID']
 			: 0;
-		$page_routes['edit_ticket_selection'] = array(
-			'func'       => array( 'EED_Attendee_Mover', '_edit_ticket_selection' ),
+		$EVT_ID = ! empty( $req_data['EVT_ID'] ) && ! is_array( $req_data['EVT_ID'] )
+			? $req_data['EVT_ID']
+			: 0;
+		$TKT_ID = ! empty( $req_data['TKT_ID'] ) && ! is_array( $req_data['TKT_ID'] )
+			? $req_data['TKT_ID']
+			: 0;
+		$page_routes['edit_attendee_selections'] = array(
+			'func'       => array( 'EED_Attendee_Mover', '_edit_attendee_selections' ),
 			'capability' => 'ee_edit_registration',
-			'obj_id'     => $reg_id,
-			'_REG_ID'    => $reg_id,
+			'obj_id'     => $REG_ID,
+			'_REG_ID'     => $REG_ID,
+			'EVT_ID'     => $EVT_ID,
+			'TKT_ID'     => $TKT_ID,
 		);
-		// $page_routes['update_wp_user_settings'] = array(
-		// 	'func'       => array( 'EED_WP_Users_Admin', 'update_wp_user_settings' ),
-		// 	'args'       => array( $admin_page ),
-		// 	'capability' => 'manage_options',
-		// 	'noheader'   => true
-		// );
+		$page_routes['process_attendee_selections'] = array(
+			'func'       => array( 'EED_Attendee_Mover', '_process_attendee_selections' ),
+			'args'       => array( $admin_page ),
+			'capability' => 'ee_edit_registration',
+			'_REG_ID'     => $REG_ID,
+			'EVT_ID'     => $EVT_ID,
+			'TKT_ID'     => $TKT_ID,
+			'noheader'   => true
+		);
 		return $page_routes;
 	}
 
@@ -164,9 +165,8 @@ class EED_Attendee_Mover extends EED_Module {
 
 	/**
 	 * callback for FHEE__Extend_Registrations_Admin_Page__page_setup__page_config
-
 	 *
-*@param array         $page_config current page config.
+	 * @param array $page_config current page config.
 	 * @param \Registrations_Admin_Page $admin_page
 	 * @since  1.0.0
 	 * @return array
@@ -176,7 +176,7 @@ class EED_Attendee_Mover extends EED_Module {
 			EED_Attendee_Mover::$admin_page = $admin_page;
 		}
 		$req_data = $admin_page->get_request_data();
-		$page_config['edit_ticket_selection'] = array(
+		$page_config['edit_attendee_selections'] = array(
 			'nav'           => array(
 				'label'      => __( 'Change Event/Ticket Selection', 'event_espresso' ),
 				'order'      => 15,
@@ -184,7 +184,7 @@ class EED_Attendee_Mover extends EED_Module {
 				'url'        => isset( $req_data['_REG_ID'] )
 					? EE_Admin_Page::add_query_args_and_nonce(
 						array(
-							'action'  => 'edit_ticket_selection',
+							'action'  => 'edit_attendee_selections',
 							'_REG_ID' => $req_data['_REG_ID']
 						),
 						$admin_page->get_current_page_view_url()
@@ -193,7 +193,7 @@ class EED_Attendee_Mover extends EED_Module {
 			),
 			'metaboxes'     => array_merge(
 				$admin_page->default_espresso_metaboxes(),
-				array( array( 'EED_Attendee_Mover', 'add_edit_ticket_selection_meta_box' ) )
+				array( array( 'EED_Attendee_Mover', 'add_edit_attendee_selections_meta_box' ) )
 			),
 			'require_nonce' => true
 		);
@@ -206,10 +206,11 @@ class EED_Attendee_Mover extends EED_Module {
 	 * @param array            $actions
 	 * @param \EE_Registration $registration
 	 * @return array
+	 * @throws \InvalidArgumentException
 	 * @throws \EE_Error
 	 */
-	public static function edit_ticket_selection_button_reg_list( $actions = array(), \EE_Registration $registration ) {
-		$actions['edit_ticket_selection'] = EED_Attendee_Mover::edit_ticket_selection_button(
+	public static function edit_attendee_selections_button_reg_list( $actions = array(), \EE_Registration $registration ) {
+		$actions['edit_attendee_selections'] = EED_Attendee_Mover::edit_attendee_selections_button(
 			$registration->ID(),
 			false,
 			'migrate',
@@ -226,8 +227,9 @@ class EED_Attendee_Mover extends EED_Module {
 	 * @param string $dashicon
 	 * @param bool   $echo
 	 * @return string|void
+	 * @throws \InvalidArgumentException
 	 */
-	public static function edit_ticket_selection_button( $REG_ID = 0, $button = true, $dashicon = 'tickets-alt', $echo = true ) {
+	public static function edit_attendee_selections_button( $REG_ID = 0, $button = true, $dashicon = 'tickets-alt', $echo = true ) {
 		if (
 			$REG_ID === 0
 			|| ! EE_Registry::instance()->CAP->current_user_can(
@@ -237,13 +239,7 @@ class EED_Attendee_Mover extends EED_Module {
 		) {
 			return '';
 		}
-		$url = EE_Admin_Page::add_query_args_and_nonce(
-			array(
-				'action'  => 'edit_ticket_selection',
-				'_REG_ID' => $REG_ID,
-			),
-			REG_ADMIN_URL
-		);
+		$url = EED_Attendee_Mover::get_edit_attendee_selections_url( $REG_ID );
 		if ( $button ) {
 			$link_text = $link_label = __( ' Change Event/Ticket Selection' );
 			$link_class = 'button secondary-button right';
@@ -268,11 +264,34 @@ class EED_Attendee_Mover extends EED_Module {
 
 
 
-	public static function add_edit_ticket_selection_meta_box() {
+	/**
+	 * @param int $REG_ID
+	 * @return string
+	 * @throws \InvalidArgumentException
+	 */
+	public static function get_edit_attendee_selections_url( $REG_ID = 0 ) {
+		$REG_ID = absint( $REG_ID );
+		if ( ! $REG_ID > 0 ) {
+			throw new InvalidArgumentException(
+				__( 'The Registration ID must be a positive integer.', 'event_espresso' )
+			);
+		}
+		return EE_Admin_Page::add_query_args_and_nonce(
+			array(
+				'action' => 'edit_attendee_selections',
+				'_REG_ID' => $REG_ID,
+			),
+			REG_ADMIN_URL
+		);
+	}
+
+
+
+	public static function add_edit_attendee_selections_meta_box() {
 		add_meta_box(
 			'edit-ticket-selection-mbox',
 			__( 'Change Event/Ticket Selection', 'event_espresso' ),
-			array( 'EED_Attendee_Mover', 'edit_ticket_selection_meta_box' ),
+			array( 'EED_Attendee_Mover', 'edit_attendee_selections_meta_box' ),
 			EED_Attendee_Mover::$admin_page->wp_page_slug(),
 			'normal',
 			'high'
@@ -281,159 +300,120 @@ class EED_Attendee_Mover extends EED_Module {
 
 
 
-	public static function edit_ticket_selections_init() {
-		EED_Attendee_Mover::instance()->_edit_ticket_selections_init();
+	/**
+	 * @return \AttendeeMover\form\StepsManager
+	 * @throws \InvalidArgumentException
+	 * @throws \EventEspresso\Core\Exceptions\InvalidDataTypeException
+	 */
+	public function get_form_steps_manager() {
+		static $form_steps_manager = null;
+		if ( ! $form_steps_manager instanceof \AttendeeMover\form\StepsManager ) {
+			$request = EE_Registry::instance()->load_core( 'Request' );
+			$REG_ID = absint( $request->get( '_REG_ID', 0 ) );
+			$form_steps_manager = new \AttendeeMover\form\StepsManager(
+				// base redirect URL
+				EED_Attendee_Mover::get_edit_attendee_selections_url( $REG_ID ),
+				// default step slug
+				'select_event',
+				// progress steps theme/style
+				'number_bubbles',
+				// EE_Request
+				$request
+			);
+		}
+		return $form_steps_manager;
 	}
 
 
 
-	public function _edit_ticket_selections_init() {
-		\EEH_Debug_Tools::printr( __FUNCTION__, __CLASS__, __FILE__, __LINE__, 2 );
-		try {
-			$this->form_steps = EED_Attendee_Mover::get_form_steps_collection();
-			$this->generate_progress_steps(
-				EED_Attendee_Mover::get_progress_steps_collection()
-			);
-			$request = \EE_Registry::instance()->load_core( 'Request' );
-			$current_step = $request->get( 'ee-step', 'select_event' );
-			if ( ! $this->form_steps->setCurrent( $current_step ) ) {
-				throw new \EventEspresso\Core\Exceptions\BaseException( 'Form Step could not be set' );
-			}
-			$this->progress_step_manager->setCurrentStep( $current_step );
-			$this->progress_step_manager->enqueueStylesAndScripts();
-			/** @var SequentialStepFormInterface $form_step */
-			$form_step = $this->form_steps->current();
-			$form_step->generate();
-			$form_step->enqueueStylesAndScripts();
-			add_action( 'admin_enqueue_scripts', array( 'EED_Attendee_Mover', 'enqueue_scripts' ) );
-		} catch ( Exception $e ) {
-			// EE_Error::add_error( $e->getMessage(), __FILE__, __FUNCTION__, __LINE__ );
-		}
+	public static function edit_attendee_selections_init() {
+		EED_Attendee_Mover::instance()->_edit_attendee_selections_init();
 	}
 
 
 
 	/**
-	 * @return \EventEspresso\core\services\collections\Collection|null
-	 * @throws \EventEspresso\Core\Exceptions\InvalidEntityException
+	 * _edit_attendee_selections_init
+	 *
+	 * callback for action that hooks into the registration admin page prior to wp_enqueue_scripts
+	 *
+	 * @access    public
+	 * @return    void
+	 * @throws \EventEspresso\Core\Exceptions\InvalidInterfaceException
 	 * @throws \EventEspresso\Core\Exceptions\InvalidIdentifierException
-	 * @throws \EventEspresso\Core\Exceptions\InvalidInterfaceException
-	 * @throws \EventEspresso\Core\Exceptions\InvalidFilePathException
-	 * @throws \EventEspresso\Core\Exceptions\InvalidDataTypeException
-	 * @throws \EventEspresso\Core\Exceptions\InvalidClassException
-	 */
-	public static function get_form_steps_collection() {
-		static $form_steps = null;
-		if ( ! $form_steps instanceof \EventEspresso\core\services\collections\Collection ) {
-			$loader = new \EventEspresso\core\services\collections\CollectionLoader(
-				new \EventEspresso\core\services\collections\CollectionDetails(
-					'attendee_mover_form_steps',
-					'\EventEspresso\core\libraries\form_sections\SequentialStepFormInterface',
-					array(
-						'\AttendeeMover\steps\form\SelectEvent',
-						'\AttendeeMover\steps\form\SelectTicket',
-						'\AttendeeMover\steps\form\VerifyChanges',
-					),
-					array(),
-					'',
-					\EventEspresso\core\services\collections\CollectionDetails::ID_CALLBACK_METHOD,
-					'slug'
-				)
-			);
-			$form_steps = $loader->getCollection();
-		}
-		return $form_steps;
-	}
-
-
-
-	/**
-	 * @return \EventEspresso\core\services\collections\Collection|null
-	 * @throws \EventEspresso\Core\Exceptions\InvalidInterfaceException
-	 */
-	public static function get_progress_steps_collection() {
-		static $collection = null;
-		if ( ! $collection instanceof \EventEspresso\core\services\progress_steps\ProgressStepCollection ) {
-			$collection = new \EventEspresso\core\services\progress_steps\ProgressStepCollection();
-		}
-		return $collection;
-	}
-
-
-
-	/**
-	 * @param \EventEspresso\core\services\collections\Collection $progress_steps_collection
 	 * @throws \EventEspresso\Core\Exceptions\InvalidEntityException
-	 * @throws \EventEspresso\Core\Exceptions\InvalidDataTypeException
 	 * @throws \EventEspresso\Core\Exceptions\InvalidClassException
-	 * @throws \EventEspresso\Core\Exceptions\InvalidInterfaceException
+	 * @throws \EventEspresso\Core\Exceptions\BaseException
+	 * @throws \InvalidArgumentException
+	 * @throws \EventEspresso\Core\Exceptions\InvalidDataTypeException
 	 */
-	public function generate_progress_steps( \EventEspresso\core\services\collections\Collection $progress_steps_collection ) {
-		/** @var SequentialStepFormInterface $form_step */
-		foreach ( $this->form_steps as $form_step ) {
-			// is this step active ?
-			if ( ! $form_step->initialize() ) {
-				continue;
-			}
-			$progress_steps_collection->add(
-				new \EventEspresso\core\services\progress_steps\ProgressStep(
-					$form_step->order(),
-					$form_step->slug(),
-					$form_step->slug(),
-					$form_step->formName()
-				),
-				$form_step->slug()
-			);
-		}
-		$this->progress_step_manager = new \EventEspresso\core\services\progress_steps\ProgressStepManager(
-			'number_bubbles',
-			'select_event',
-			$progress_steps_collection
-		);
+	public function _edit_attendee_selections_init() {
+		\EEH_Debug_Tools::printr( __FUNCTION__, __CLASS__, __FILE__, __LINE__, 2 );
+		$form_steps_manager = $this->get_form_steps_manager();
+		$form_steps_manager->buildForm();
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 	}
 
 
 
-	public static function _edit_ticket_selection() {
+	/**
+	 * callback that displays the page template
+	 */
+	public static function _edit_attendee_selections() {
 		// the details template wrapper
 		EED_Attendee_Mover::$admin_page->display_admin_page_with_sidebar();
 	}
 
 
 
-	public static function edit_ticket_selection_meta_box() {
-		EED_Attendee_Mover::instance()->_edit_ticket_selection_meta_box();
-	}
-
-
-
-	public function _edit_ticket_selection_meta_box() {
-		\EEH_Debug_Tools::printr( __FUNCTION__, __CLASS__, __FILE__, __LINE__, 2 );
-		$this->progress_step_manager->displaySteps();
-		/** @var SequentialStepFormInterface $form_step */
-		$form_step = $this->form_steps->current();
-		echo \EEH_HTML::h1( $form_step->formName() );
-		echo $form_step->display();
+	/**
+	 * callback that adds the main "edit_attendee_selections" meta_box
+	 * calls non static method below
+	 *
+	 * @throws \EventEspresso\Core\Exceptions\InvalidDataTypeException
+	 * @throws \InvalidArgumentException
+	 */
+	public static function edit_attendee_selections_meta_box() {
+		EED_Attendee_Mover::instance()->_edit_attendee_selections_meta_box();
 	}
 
 
 
 	/**
-	  * displayAttendeeMoverForm
-	  *
-	  * @access    public
-	  * @return    void
-	  */
-	 public function displayAttendeeMoverForm() {
-		 // $CollectionLoaderManager = new \EventEspresso\core\services\collections\CollectionLoader(
-			//  new \EventEspresso\core\services\progress_steps\ProgressStepCollection(),
-			//  new \EspressoAttendeeMover\core\ProgressStepCollectionDetails()
-		 // );
-		 // $ProgressStepManager = new \EventEspresso\core\services\progress_steps\ProgressStepManager(
-			//  $CollectionLoaderManager->getCollection()
-		 // );
-		 // $ProgressStepManager->currentStep();
-	 }
+	 * _edit_attendee_selections_meta_box
+	 *
+	 * @throws \EventEspresso\Core\Exceptions\InvalidDataTypeException
+	 * @throws \InvalidArgumentException
+	 */
+	public function _edit_attendee_selections_meta_box() {
+		\EEH_Debug_Tools::printr( __FUNCTION__, __CLASS__, __FILE__, __LINE__, 2 );
+		$form_steps_manager = $this->get_form_steps_manager();
+		echo $form_steps_manager->displayProgressSteps();
+		echo \EEH_HTML::h1( $form_steps_manager->getCurrentStep()->formName() );
+		echo $form_steps_manager->displayCurrentStepForm();
+	}
+
+
+
+	/**
+	 * _process_attendee_selections
+	 * callback route for when the attendee mover step forms are being processed
+	 *
+	 * @access    public
+	 * @param \Registrations_Admin_Page $admin_page
+	 * @throws \EventEspresso\Core\Exceptions\BaseException
+	 * @throws \EventEspresso\Core\Exceptions\InvalidClassException
+	 * @throws \EventEspresso\Core\Exceptions\InvalidInterfaceException
+	 * @throws \EventEspresso\Core\Exceptions\InvalidDataTypeException
+	 * @throws \EventEspresso\Core\Exceptions\InvalidEntityException
+	 * @throws \EventEspresso\Core\Exceptions\InvalidIdentifierException
+	 * @throws \InvalidArgumentException
+	 */
+	public function _process_attendee_selections( \Registrations_Admin_Page $admin_page ) {
+		\EEH_Debug_Tools::printr( __FUNCTION__, __CLASS__, __FILE__, __LINE__, 2 );
+		$form_steps_manager = $this->get_form_steps_manager();
+		$form_steps_manager->processForm( $admin_page->get_request_data() );
+	}
 
 
 
@@ -446,8 +426,8 @@ class EED_Attendee_Mover extends EED_Module {
 	 *  @access 	public
 	 *  @return 	void
 	 */
-	public static function enqueue_scripts() {
-		\EEH_Debug_Tools::printr( __FUNCTION__, __CLASS__, __FILE__, __LINE__, 2 );
+	public function enqueue_scripts() {
+		\EEH_Debug_Tools::printr( __FUNCTION__ . ' &nbsp; (callback hooked into admin_enqueue_scripts)', __CLASS__, __FILE__, __LINE__, 2 );
 		//Check to see if the attendee_mover css file exists in the '/uploads/espresso/' directory
 		if ( is_readable( EVENT_ESPRESSO_UPLOAD_DIR . "css/attendee_mover.css")) {
 			//This is the url to the css file if available
