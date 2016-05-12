@@ -1,5 +1,5 @@
 <?php
-namespace AttendeeMover\steps\form;
+namespace AttendeeMover\form;
 
 use EE_Error;
 use EE_Form_Section_Proper;
