@@ -6,20 +6,41 @@
 /*
 General Styles
 ---------------------------------------------------------------------------------------------------- */
+.select2 {
+	width:50% !important;
+}
+
+#edit-attendee-selection-mbox .ee-cancel-form,
+#edit-attendee-selection-mbox .ee-form-submit {
+	float: right;
+	margin-left:1em;
+}
 
 
 /* Media Query for screens smaller then 768px (iPad portrait)
 ---------------------------------------------------------------------------------------------------- */
 
 @media only screen and (max-width: 767px) {
+	.select2 {
+		width: 60% !important;
+	}
 }
 
 @media only screen and (max-width: 600px) and (min-width: 481px) {
+	.select2 {
+		width: 80% !important;
+	}
 }
 
 @media only screen and (max-width: 540px) and (min-width: 480px) {
+	.select2 {
+		width: 100% !important;
+	}
 }
 
 @media only screen and (max-width: 480px) {
+	.select2 {
+		width: 100% !important;
+	}
 }
 
