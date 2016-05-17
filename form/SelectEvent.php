@@ -1,13 +1,12 @@
 <?php
 namespace AttendeeMover\form;
 
-use EE_Error;
 use EE_Form_Section_Proper;
+use EE_Error;
+use LogicException;
+use InvalidArgumentException;
 use EventEspresso\Core\Exceptions\InvalidDataTypeException;
 use EventEspresso\Core\Exceptions\InvalidFormSubmissionException;
-use EventEspresso\core\libraries\form_sections\SequentialStepForm;
-use InvalidArgumentException;
-use LogicException;
 
 if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
 	exit( 'No direct script access allowed' );
@@ -23,13 +22,14 @@ if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
  * @author        Brent Christensen
  * @since         4.9.0
  */
-class SelectEvent extends SequentialStepForm {
+class SelectEvent extends Step {
 
 	/**
 	 * SelectEvent constructor.
 	 *
 	 * @throws InvalidDataTypeException
 	 * @throws InvalidArgumentException
+	 * @throws \DomainException
 	 */
 	public function __construct() {
 		parent::__construct(
@@ -50,14 +50,17 @@ class SelectEvent extends SequentialStepForm {
 	 * @throws LogicException
 	 */
 	public function generate() {
-		\EEH_Debug_Tools::printr( __FUNCTION__, __CLASS__, __FILE__, __LINE__, 2 );
 		$this->setForm(
 			new \EE_Form_Section_Proper(
 				array(
-					'name'   => $this->formName(),
-					'subsections' => array(
-						'event' => new \EE_Select_Ajax_Model_Rest_Input(
+					'name'          => $this->formName(),
+					'subsections'   => array(
+						'EVT_ID' => new \EE_Select_Ajax_Model_Rest_Input(
 							array(
+								'html_name'          => 'ee-select2-' . $this->slug(),
+								'html_id'            => 'ee-select2-' . $this->slug(),
+								'html_class'         => 'ee-select2',
+								'html_label_text'    => __( 'Select New Event', 'event_espresso' ),
 								'model_name'         => 'Event',
 								'display_field_name' => 'EVT_name',
 								'query_params'       => array(
@@ -87,14 +90,13 @@ class SelectEvent extends SequentialStepForm {
 	 * @throws InvalidDataTypeException
 	 */
 	public function process( $form_data = array() ) {
-		\EEH_Debug_Tools::printr( __FUNCTION__, __CLASS__, __FILE__, __LINE__, 2 );
 		// process form
-		$valid_data = parent::process( $form_data );
+		$valid_data = (array) parent::process( $form_data );
 		if ( empty( $valid_data ) ) {
 			return false;
 		}
 		// set $EVT_ID from valid form data
-		$EVT_ID = 0;
+		$EVT_ID = isset( $valid_data['EVT_ID' ] ) ? absint( $valid_data['EVT_ID' ] ) : 0;
 		if ( $EVT_ID ) {
 			$this->addRedirectArgs(  array( 'EVT_ID' => $EVT_ID ) );
 			return true;
