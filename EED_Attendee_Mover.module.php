@@ -1,4 +1,5 @@
 <?php
+use EventEspresso\core\libraries\form_sections\Form;
 
 if ( ! defined( 'EVENT_ESPRESSO_VERSION')) { exit('No direct script access allowed'); }
 /**
@@ -35,8 +36,6 @@ class EED_Attendee_Mover extends EED_Module {
 	  *  @return 	void
 	  */
 	 public static function set_hooks() {
-		 EE_Psr4AutoloaderInit::psr4_loader()->addNamespace( 'AttendeeMover', __DIR__ );
-		 // EE_Config::register_route( 'attendee_mover', 'EED_Attendee_Mover', 'run' );
 	 }
 
 	 /**
@@ -114,7 +113,6 @@ class EED_Attendee_Mover extends EED_Module {
 	  * @return    void
 	  */
 	 public function run( $WP ) {
-		 // add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ));
 	 }
 
 
@@ -142,7 +140,7 @@ class EED_Attendee_Mover extends EED_Module {
 			? $req_data['TKT_ID']
 			: 0;
 		$page_routes['edit_attendee_selections'] = array(
-			'func'       => array( 'EED_Attendee_Mover', '_edit_attendee_selections' ),
+			'func'       => array( 'EED_Attendee_Mover', 'edit_attendee_selections' ),
 			'capability' => 'ee_edit_registration',
 			'obj_id'     => $REG_ID,
 			'_REG_ID'     => $REG_ID,
@@ -150,7 +148,7 @@ class EED_Attendee_Mover extends EED_Module {
 			'TKT_ID'     => $TKT_ID,
 		);
 		$page_routes['process_attendee_selections'] = array(
-			'func'       => array( 'EED_Attendee_Mover', '_process_attendee_selections' ),
+			'func'       => array( 'EED_Attendee_Mover', 'process_attendee_selections' ),
 			'args'       => array( $admin_page ),
 			'capability' => 'ee_edit_registration',
 			'_REG_ID'     => $REG_ID,
@@ -265,11 +263,12 @@ class EED_Attendee_Mover extends EED_Module {
 
 
 	/**
-	 * @param int $REG_ID
+	 * @param int  $REG_ID
+	 * @param bool $process
 	 * @return string
 	 * @throws \InvalidArgumentException
 	 */
-	public static function get_edit_attendee_selections_url( $REG_ID = 0 ) {
+	public static function get_edit_attendee_selections_url( $REG_ID = 0, $process = false ) {
 		$REG_ID = absint( $REG_ID );
 		if ( ! $REG_ID > 0 ) {
 			throw new InvalidArgumentException(
@@ -278,7 +277,7 @@ class EED_Attendee_Mover extends EED_Module {
 		}
 		return EE_Admin_Page::add_query_args_and_nonce(
 			array(
-				'action' => 'edit_attendee_selections',
+				'action'  => $process ? 'process_attendee_selections' : 'edit_attendee_selections',
 				'_REG_ID' => $REG_ID,
 			),
 			REG_ADMIN_URL
@@ -289,7 +288,7 @@ class EED_Attendee_Mover extends EED_Module {
 
 	public static function add_edit_attendee_selections_meta_box() {
 		add_meta_box(
-			'edit-ticket-selection-mbox',
+			'edit-attendee-selection-mbox',
 			__( 'Change Event/Ticket Selection', 'event_espresso' ),
 			array( 'EED_Attendee_Mover', 'edit_attendee_selections_meta_box' ),
 			EED_Attendee_Mover::$admin_page->wp_page_slug(),
@@ -301,20 +300,26 @@ class EED_Attendee_Mover extends EED_Module {
 
 
 	/**
+	 * @param bool $process
 	 * @return \AttendeeMover\form\StepsManager
+	 * @throws \EventEspresso\Core\Exceptions\BaseException
 	 * @throws \InvalidArgumentException
 	 * @throws \EventEspresso\Core\Exceptions\InvalidDataTypeException
 	 */
-	public function get_form_steps_manager() {
+	public function get_form_steps_manager( $process = true ) {
 		static $form_steps_manager = null;
 		if ( ! $form_steps_manager instanceof \AttendeeMover\form\StepsManager ) {
 			$request = EE_Registry::instance()->load_core( 'Request' );
 			$REG_ID = absint( $request->get( '_REG_ID', 0 ) );
 			$form_steps_manager = new \AttendeeMover\form\StepsManager(
 				// base redirect URL
-				EED_Attendee_Mover::get_edit_attendee_selections_url( $REG_ID ),
+				EED_Attendee_Mover::get_edit_attendee_selections_url( $REG_ID, $process ),
 				// default step slug
 				'select_event',
+				// form action
+				'',
+				// form config
+				Form::ADD_FORM_TAGS_AND_SUBMIT,
 				// progress steps theme/style
 				'number_bubbles',
 				// EE_Request
@@ -334,10 +339,9 @@ class EED_Attendee_Mover extends EED_Module {
 
 	/**
 	 * _edit_attendee_selections_init
+ * callback for action that hooks into the registration admin page prior to wp_enqueue_scripts
 	 *
-	 * callback for action that hooks into the registration admin page prior to wp_enqueue_scripts
-	 *
-	 * @access    public
+	 * @access    protected
 	 * @return    void
 	 * @throws \EventEspresso\Core\Exceptions\InvalidInterfaceException
 	 * @throws \EventEspresso\Core\Exceptions\InvalidIdentifierException
@@ -347,11 +351,10 @@ class EED_Attendee_Mover extends EED_Module {
 	 * @throws \InvalidArgumentException
 	 * @throws \EventEspresso\Core\Exceptions\InvalidDataTypeException
 	 */
-	public function _edit_attendee_selections_init() {
-		\EEH_Debug_Tools::printr( __FUNCTION__, __CLASS__, __FILE__, __LINE__, 2 );
+	protected function _edit_attendee_selections_init() {
 		$form_steps_manager = $this->get_form_steps_manager();
 		$form_steps_manager->buildForm();
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ), 1 );
 	}
 
 
@@ -359,7 +362,7 @@ class EED_Attendee_Mover extends EED_Module {
 	/**
 	 * callback that displays the page template
 	 */
-	public static function _edit_attendee_selections() {
+	public static function edit_attendee_selections() {
 		// the details template wrapper
 		EED_Attendee_Mover::$admin_page->display_admin_page_with_sidebar();
 	}
@@ -372,6 +375,7 @@ class EED_Attendee_Mover extends EED_Module {
 	 *
 	 * @throws \EventEspresso\Core\Exceptions\InvalidDataTypeException
 	 * @throws \InvalidArgumentException
+	 * @throws \EventEspresso\Core\Exceptions\BaseException
 	 */
 	public static function edit_attendee_selections_meta_box() {
 		EED_Attendee_Mover::instance()->_edit_attendee_selections_meta_box();
@@ -384,9 +388,9 @@ class EED_Attendee_Mover extends EED_Module {
 	 *
 	 * @throws \EventEspresso\Core\Exceptions\InvalidDataTypeException
 	 * @throws \InvalidArgumentException
+	 * @throws \EventEspresso\Core\Exceptions\BaseException
 	 */
 	public function _edit_attendee_selections_meta_box() {
-		\EEH_Debug_Tools::printr( __FUNCTION__, __CLASS__, __FILE__, __LINE__, 2 );
 		$form_steps_manager = $this->get_form_steps_manager();
 		echo $form_steps_manager->displayProgressSteps();
 		echo \EEH_HTML::h1( $form_steps_manager->getCurrentStep()->formName() );
@@ -396,7 +400,7 @@ class EED_Attendee_Mover extends EED_Module {
 
 
 	/**
-	 * _process_attendee_selections
+	 * process_attendee_selections
 	 * callback route for when the attendee mover step forms are being processed
 	 *
 	 * @access    public
@@ -409,9 +413,28 @@ class EED_Attendee_Mover extends EED_Module {
 	 * @throws \EventEspresso\Core\Exceptions\InvalidIdentifierException
 	 * @throws \InvalidArgumentException
 	 */
-	public function _process_attendee_selections( \Registrations_Admin_Page $admin_page ) {
-		\EEH_Debug_Tools::printr( __FUNCTION__, __CLASS__, __FILE__, __LINE__, 2 );
-		$form_steps_manager = $this->get_form_steps_manager();
+	public static function process_attendee_selections( \Registrations_Admin_Page $admin_page ) {
+		EED_Attendee_Mover::instance()->_process_attendee_selections( $admin_page );
+	}
+
+
+
+	/**
+	 * _process_attendee_selections
+	 * callback route for when the attendee mover step forms are being processed
+	 *
+	 * @access protected
+	 * @param  \Registrations_Admin_Page $admin_page
+	 * @throws \EventEspresso\Core\Exceptions\BaseException
+	 * @throws \EventEspresso\Core\Exceptions\InvalidClassException
+	 * @throws \EventEspresso\Core\Exceptions\InvalidInterfaceException
+	 * @throws \EventEspresso\Core\Exceptions\InvalidDataTypeException
+	 * @throws \EventEspresso\Core\Exceptions\InvalidEntityException
+	 * @throws \EventEspresso\Core\Exceptions\InvalidIdentifierException
+	 * @throws \InvalidArgumentException
+	 */
+	protected function _process_attendee_selections( \Registrations_Admin_Page $admin_page ) {
+		$form_steps_manager = $this->get_form_steps_manager( false );
 		$form_steps_manager->processForm( $admin_page->get_request_data() );
 	}
 
@@ -427,15 +450,11 @@ class EED_Attendee_Mover extends EED_Module {
 	 *  @return 	void
 	 */
 	public function enqueue_scripts() {
-		\EEH_Debug_Tools::printr( __FUNCTION__ . ' &nbsp; (callback hooked into admin_enqueue_scripts)', __CLASS__, __FILE__, __LINE__, 2 );
-		//Check to see if the attendee_mover css file exists in the '/uploads/espresso/' directory
-		if ( is_readable( EVENT_ESPRESSO_UPLOAD_DIR . "css/attendee_mover.css")) {
-			//This is the url to the css file if available
-			wp_register_style( 'espresso_attendee_mover', EVENT_ESPRESSO_UPLOAD_URL . 'css/espresso_attendee_mover.css' );
-		} else {
-			// EE attendee_mover style
-			wp_register_style( 'espresso_attendee_mover', EE_ATTENDEE_MOVER_URL . 'css/espresso_attendee_mover.css' );
-		}
+		// EE attendee_mover style
+		wp_register_style(
+			'espresso_attendee_mover',
+			EE_ATTENDEE_MOVER_URL . 'css/espresso_attendee_mover.css'
+		);
 		// attendee_mover script
 		wp_register_script(
 			'espresso_attendee_mover',
