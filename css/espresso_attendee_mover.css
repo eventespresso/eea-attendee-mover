@@ -16,6 +16,14 @@ General Styles
 	margin-left:1em;
 }
 
+#edit-attendee-selection-mbox .ee-txn-refund {
+	color: #E44064;
+	font-weight: bold;
+}
+#edit-attendee-selection-mbox .jst-rght {
+	text-align: right;
+}
+
 
 /* Media Query for screens smaller then 768px (iPad portrait)
 ---------------------------------------------------------------------------------------------------- */
