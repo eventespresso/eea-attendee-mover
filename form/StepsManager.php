@@ -8,6 +8,7 @@ use EventEspresso\Core\Exceptions\InvalidEntityException;
 use EventEspresso\Core\Exceptions\InvalidFilePathException;
 use EventEspresso\Core\Exceptions\InvalidIdentifierException;
 use EventEspresso\Core\Exceptions\InvalidInterfaceException;
+use EventEspresso\core\libraries\form_sections\Form;
 use EventEspresso\core\libraries\form_sections\SequentialStepFormManager;
 use EventEspresso\core\services\collections\Collection;
 use EventEspresso\core\services\collections\CollectionDetails;
@@ -37,45 +38,30 @@ class StepsManager extends SequentialStepFormManager {
 	 *
 	 * @param string      $base_url
 	 * @param string      $default_form_step
+	 * @param string      $form_action
+	 * @param string      $form_config
 	 * @param string      $progress_step_style
 	 * @param \EE_Request $request
 	 * @throws InvalidDataTypeException
 	 * @throws InvalidArgumentException
-	 */
-	public function __construct( $base_url, $default_form_step, $progress_step_style, \EE_Request $request = null) {
-		parent::__construct( $base_url, $default_form_step, $progress_step_style, $request );
-	}
-
-
-
-	/**
 	 * @throws BaseException
-	 * @throws InvalidClassException
-	 * @throws InvalidDataTypeException
-	 * @throws InvalidEntityException
-	 * @throws InvalidIdentifierException
-	 * @throws InvalidInterfaceException
-	 * @throws InvalidArgumentException
 	 */
-	public function buildForm() {
-		$this->buildCurrentStepFormForDisplay();
-	}
-
-
-
-	/**
-	 * @param array $form_data
-	 * @throws BaseException
-	 * @throws InvalidClassException
-	 * @throws InvalidDataTypeException
-	 * @throws InvalidEntityException
-	 * @throws InvalidIdentifierException
-	 * @throws InvalidInterfaceException
-	 * @throws InvalidArgumentException
-	 */
-	public function processForm( $form_data = array() ) {
-		$this->buildCurrentStepFormForProcessing();
-		$this->processCurrentStepForm( $form_data );
+	public function __construct(
+		$base_url,
+		$default_form_step,
+		$form_action = '',
+		$form_config = Form::ADD_FORM_TAGS_AND_SUBMIT,
+		$progress_step_style = 'number_bubbles',
+		\EE_Request $request = null
+	) {
+		parent::__construct(
+			$base_url,
+			$default_form_step,
+			$form_action,
+			$form_config,
+			$progress_step_style,
+			$request
+		);
 	}
 
 
@@ -95,11 +81,12 @@ class StepsManager extends SequentialStepFormManager {
 			$loader = new CollectionLoader(
 				new CollectionDetails(
 					'attendee_mover_form_steps',
-					'\EventEspresso\core\libraries\form_sections\SequentialStepFormInterface',
+					'\AttendeeMover\form\Step',
 					array(
 						'\AttendeeMover\form\SelectEvent',
 						'\AttendeeMover\form\SelectTicket',
 						'\AttendeeMover\form\VerifyChanges',
+						'\AttendeeMover\form\Complete',
 					),
 					array(),
 					'',
