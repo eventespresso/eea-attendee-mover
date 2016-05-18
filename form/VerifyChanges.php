@@ -41,7 +41,12 @@ class VerifyChanges extends Step {
 		$this->REG_ID = $this->getRegId();
 		$this->EVT_ID = $this->getEventId();
 		$this->TKT_ID = $this->getTicketId();
-
+		$this->addRedirectArgs(
+			array(
+				'EVT_ID' => $this->EVT_ID,
+				'TKT_ID' => $this->TKT_ID,
+			)
+		);
 		$this->addFormActionArgs(
 			array(
 				'EVT_ID' => $this->EVT_ID,
@@ -186,12 +191,6 @@ class VerifyChanges extends Step {
 			// todo return to registration screen
 			return false;
 		}
-		$this->addRedirectArgs(
-			array(
-				'EVT_ID' => $this->getEventId(),
-				'TKT_ID' => $this->getTicketId(),
-			)
-		);
 		return true;
 	}
 
