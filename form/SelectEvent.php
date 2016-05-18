@@ -64,7 +64,13 @@ class SelectEvent extends Step {
 								'model_name'         => 'Event',
 								'display_field_name' => 'EVT_name',
 								'query_params'       => array(
-									'caps' => \EEM_Base::caps_read_admin
+									0 => array(
+										'Datetime.DTT_EVT_end' => array(
+											'>',
+											\EEM_Datetime::instance()->current_time_for_query( 'DTT_EVT_end' )
+										),
+									),
+									'caps'  => \EEM_Base::caps_read_admin
 								)
 							)
 						)
