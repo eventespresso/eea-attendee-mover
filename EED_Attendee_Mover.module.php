@@ -126,9 +126,7 @@ class EED_Attendee_Mover extends EED_Module {
 	 * @return mixed
 	 */
 	public static function attendee_mover_page_routes( array $page_routes, \Registrations_Admin_Page $admin_page ) {
-		if ( $admin_page instanceof \Registrations_Admin_Page ) {
-			EED_Attendee_Mover::$admin_page = $admin_page;
-		}
+		EED_Attendee_Mover::$admin_page = $admin_page;
 		$req_data = $admin_page->get_request_data();
 		$REG_ID = ! empty( $req_data['_REG_ID'] ) && ! is_array( $req_data['_REG_ID'] )
 			? $req_data['_REG_ID']
@@ -170,9 +168,7 @@ class EED_Attendee_Mover extends EED_Module {
 	 * @return array
 	 */
 	public static function attendee_mover_page_config( $page_config, \Registrations_Admin_Page $admin_page ) {
-		if ( $admin_page instanceof \Registrations_Admin_Page ) {
-			EED_Attendee_Mover::$admin_page = $admin_page;
-		}
+		EED_Attendee_Mover::$admin_page = $admin_page;
 		$req_data = $admin_page->get_request_data();
 		$page_config['edit_attendee_selections'] = array(
 			'nav'           => array(
@@ -208,12 +204,21 @@ class EED_Attendee_Mover extends EED_Module {
 	 * @throws \EE_Error
 	 */
 	public static function edit_attendee_selections_button_reg_list( $actions = array(), \EE_Registration $registration ) {
-		$actions['edit_attendee_selections'] = EED_Attendee_Mover::edit_attendee_selections_button(
-			$registration->ID(),
-			false,
-			'migrate',
-			false
-		);
+		if (
+			! in_array(
+				$registration->status_ID(),
+				array(
+					EEM_Registration::status_id_cancelled,
+					EEM_Registration::status_id_declined,
+				)
+			)
+		) {
+			$actions['edit_attendee_selections'] = EED_Attendee_Mover::edit_attendee_selections_button(
+				$registration->ID(),
+				false,
+				false
+			);
+		}
 		return $actions;
 	}
 
@@ -222,12 +227,11 @@ class EED_Attendee_Mover extends EED_Module {
 	/**
 	 * @param int    $REG_ID
 	 * @param bool   $button
-	 * @param string $dashicon
 	 * @param bool   $echo
 	 * @return string|void
 	 * @throws \InvalidArgumentException
 	 */
-	public static function edit_attendee_selections_button( $REG_ID = 0, $button = true, $dashicon = 'tickets-alt', $echo = true ) {
+	public static function edit_attendee_selections_button( $REG_ID = 0, $button = true, $echo = true ) {
 		if (
 			$REG_ID === 0
 			|| ! EE_Registry::instance()->CAP->current_user_can(
@@ -250,7 +254,7 @@ class EED_Attendee_Mover extends EED_Module {
 			$url,
 			$link_text,
 			$link_class,
-			'dashicons dashicons-' . $dashicon,
+			'dashicons dashicons-tickets-alt dashicons dashicons-update',
 			$link_label
 		);
 		if ( $echo ) {
