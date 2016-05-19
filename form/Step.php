@@ -18,11 +18,11 @@ if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
 
 /**
  * Class Step
- * Description
+ * abstract parent class for individual forms in the Attendee Mover sequential form
  *
  * @package       Event Espresso
  * @author        Brent Christensen
- * @since         4.9.0
+ * @since         1.0.0
  */
 abstract class Step extends SequentialStepForm {
 
