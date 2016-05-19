@@ -15,11 +15,11 @@ if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
 
 /**
  * Class VerifyChanges
- * Description
+ * the third form in the sequential form steps for the Attendee Mover admin page
  *
  * @package       Event Espresso
  * @author        Brent Christensen
- * @since         4.9.0
+ * @since         1.0.0
  */
 class VerifyChanges extends Step {
 
