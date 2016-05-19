@@ -135,6 +135,16 @@ class Complete extends Step
 				'_REG_ID' => $new_registration->ID()
 			)
 		);
+		\EE_Error::add_success(
+			sprintf(
+				__(
+					'Registration ID:%1$s has been successfully cancelled, and Registration ID:%2$s has been created to replace it.',
+					'event_espresso'
+				),
+				$old_registration->ID(),
+				$new_registration->ID()
+			)
+		);
 		return true;
 	}
 
