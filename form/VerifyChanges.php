@@ -1,8 +1,11 @@
 <?php
 namespace AttendeeMover\form;
 
+use EE_Admin_Page;
+use EE_Error;
 use EE_Form_Section_HTML;
 use EE_Form_Section_Proper;
+use EED_Attendee_Mover;
 use EEH_HTML;
 use InvalidArgumentException;
 use EventEspresso\Core\Exceptions\InvalidDataTypeException;
@@ -188,8 +191,20 @@ class VerifyChanges extends Step {
 		         && $valid_data['verify_changes-submit-btn'] === __( 'Submit', 'event_espresso' )
 			)
 		) {
-			// todo return to registration screen
-			return false;
+			EE_Error::add_attention(
+				__( 'Registration changes have been cancelled.', 'event_espresso' )
+			);
+			EE_Error::get_notices( false, true );
+			wp_safe_redirect(
+				EE_Admin_Page::add_query_args_and_nonce(
+					array(
+						'action'  => 'view_registration',
+						'_REG_ID' => $this->REG_ID,
+					),
+					REG_ADMIN_URL
+				)
+			);
+			exit();
 		}
 		return true;
 	}
