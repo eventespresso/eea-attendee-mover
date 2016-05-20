@@ -8,7 +8,7 @@ use EventEspresso\Core\Exceptions\InvalidEntityException;
 use EventEspresso\Core\Exceptions\InvalidFilePathException;
 use EventEspresso\Core\Exceptions\InvalidIdentifierException;
 use EventEspresso\Core\Exceptions\InvalidInterfaceException;
-use EventEspresso\core\libraries\form_sections\Form;
+use EventEspresso\core\libraries\form_sections\FormHandler;
 use EventEspresso\core\libraries\form_sections\SequentialStepFormManager;
 use EventEspresso\core\services\collections\Collection;
 use EventEspresso\core\services\collections\CollectionDetails;
@@ -50,7 +50,7 @@ class StepsManager extends SequentialStepFormManager {
 		$base_url,
 		$default_form_step,
 		$form_action = '',
-		$form_config = Form::ADD_FORM_TAGS_AND_SUBMIT,
+		$form_config = FormHandler::ADD_FORM_TAGS_AND_SUBMIT,
 		$progress_step_style = 'number_bubbles',
 		\EE_Request $request = null
 	) {
