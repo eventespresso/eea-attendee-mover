@@ -1,5 +1,5 @@
 <?php
-use EventEspresso\core\libraries\form_sections\Form;
+use EventEspresso\core\libraries\form_sections\FormHandler;
 
 if ( ! defined( 'EVENT_ESPRESSO_VERSION')) { exit('No direct script access allowed'); }
 /**
@@ -323,7 +323,7 @@ class EED_Attendee_Mover extends EED_Module {
 				// form action
 				'',
 				// form config
-				Form::ADD_FORM_TAGS_AND_SUBMIT,
+				FormHandler::ADD_FORM_TAGS_AND_SUBMIT,
 				// progress steps theme/style
 				'number_bubbles',
 				// EE_Request
