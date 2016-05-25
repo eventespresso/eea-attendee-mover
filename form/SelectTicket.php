@@ -1,5 +1,5 @@
 <?php
-namespace AttendeeMover\form;
+namespace EventEspresso\AttendeeMover\form;
 
 use EE_Datetime;
 use EE_Event;
@@ -42,6 +42,7 @@ class SelectTicket extends Step {
 		);
 		$this->EVT_ID = $this->getEventId();
 		$this->addFormActionArgs( array( 'EVT_ID' => $this->EVT_ID) );
+		$this->addRedirectArgs( array( 'EVT_ID' => $this->EVT_ID ) );
 	}
 
 
@@ -86,6 +87,7 @@ class SelectTicket extends Step {
 								'html_id'            => 'ee-' . $this->slug(),
 								'html_class'         => 'ee-' . $this->slug(),
 								'html_label_text'    => __( 'Select New Ticket', 'event_espresso' ),
+								'required'           => true,
 							)
 						)
 					)
@@ -118,9 +120,7 @@ class SelectTicket extends Step {
 		$TKT_ID = isset( $valid_data['TKT_ID' ] ) ? absint( $valid_data['TKT_ID' ] ) : 0;
 		// process form and set $TKT_ID
 		if ( $TKT_ID ) {
-			$this->addRedirectArgs(
-				array( 'EVT_ID' => $this->getEventId(),  'TKT_ID' => $TKT_ID )
-			);
+			$this->addRedirectArgs( array( 'TKT_ID' => $TKT_ID ) );
 			return true;
 		}
 		return false;
