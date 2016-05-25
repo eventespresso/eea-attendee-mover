@@ -1,5 +1,5 @@
 <?php
-namespace AttendeeMover\form;
+namespace EventEspresso\AttendeeMover\form;
 
 use EE_Event;
 use EE_Registration;
