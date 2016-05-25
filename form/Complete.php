@@ -1,5 +1,5 @@
 <?php
-namespace AttendeeMover\form;
+namespace EventEspresso\AttendeeMover\form;
 
 use AttendeeMover\services\MoveAttendee;
 
