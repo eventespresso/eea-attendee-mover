@@ -1,5 +1,5 @@
 <?php
-namespace AttendeeMover\services;
+namespace EventEspresso\AttendeeMover\services;
 
 use EventEspresso\core\exceptions\EntityNotFoundException;
 use EventEspresso\core\services\registration\Cancel;

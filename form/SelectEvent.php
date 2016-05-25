@@ -1,5 +1,5 @@
 <?php
-namespace AttendeeMover\form;
+namespace EventEspresso\AttendeeMover\form;
 
 use EE_Form_Section_Proper;
 use EE_Error;
@@ -71,7 +71,8 @@ class SelectEvent extends Step {
 										),
 									),
 									'caps'  => \EEM_Base::caps_read_admin
-								)
+								),
+								'required'           => true,
 							)
 						)
 					)
