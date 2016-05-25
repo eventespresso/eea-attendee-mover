@@ -306,9 +306,9 @@ class EED_Attendee_Mover extends EED_Module {
 	/**
 	 * @param bool $process
 	 * @return \AttendeeMover\form\StepsManager
-	 * @throws \EventEspresso\Core\Exceptions\BaseException
+	 * @throws \EventEspresso\core\exceptions\BaseException
 	 * @throws \InvalidArgumentException
-	 * @throws \EventEspresso\Core\Exceptions\InvalidDataTypeException
+	 * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
 	 */
 	public function get_form_steps_manager( $process = true ) {
 		static $form_steps_manager = null;
@@ -347,13 +347,13 @@ class EED_Attendee_Mover extends EED_Module {
 	 *
 	 * @access    protected
 	 * @return    void
-	 * @throws \EventEspresso\Core\Exceptions\InvalidInterfaceException
-	 * @throws \EventEspresso\Core\Exceptions\InvalidIdentifierException
-	 * @throws \EventEspresso\Core\Exceptions\InvalidEntityException
-	 * @throws \EventEspresso\Core\Exceptions\InvalidClassException
-	 * @throws \EventEspresso\Core\Exceptions\BaseException
+	 * @throws \EventEspresso\core\exceptions\InvalidInterfaceException
+	 * @throws \EventEspresso\core\exceptions\InvalidIdentifierException
+	 * @throws \EventEspresso\core\exceptions\InvalidEntityException
+	 * @throws \EventEspresso\core\exceptions\InvalidClassException
+	 * @throws \EventEspresso\core\exceptions\BaseException
 	 * @throws \InvalidArgumentException
-	 * @throws \EventEspresso\Core\Exceptions\InvalidDataTypeException
+	 * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
 	 */
 	protected function _edit_attendee_selections_init() {
 		$form_steps_manager = $this->get_form_steps_manager();
@@ -377,9 +377,9 @@ class EED_Attendee_Mover extends EED_Module {
 	 * callback that adds the main "edit_attendee_selections" meta_box
 	 * calls non static method below
 	 *
-	 * @throws \EventEspresso\Core\Exceptions\InvalidDataTypeException
+	 * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
 	 * @throws \InvalidArgumentException
-	 * @throws \EventEspresso\Core\Exceptions\BaseException
+	 * @throws \EventEspresso\core\exceptions\BaseException
 	 */
 	public static function edit_attendee_selections_meta_box() {
 		EED_Attendee_Mover::instance()->_edit_attendee_selections_meta_box();
@@ -390,9 +390,9 @@ class EED_Attendee_Mover extends EED_Module {
 	/**
 	 * _edit_attendee_selections_meta_box
 	 *
-	 * @throws \EventEspresso\Core\Exceptions\InvalidDataTypeException
+	 * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
 	 * @throws \InvalidArgumentException
-	 * @throws \EventEspresso\Core\Exceptions\BaseException
+	 * @throws \EventEspresso\core\exceptions\BaseException
 	 */
 	public function _edit_attendee_selections_meta_box() {
 		$form_steps_manager = $this->get_form_steps_manager();
@@ -409,12 +409,12 @@ class EED_Attendee_Mover extends EED_Module {
 	 *
 	 * @access    public
 	 * @param \Registrations_Admin_Page $admin_page
-	 * @throws \EventEspresso\Core\Exceptions\BaseException
-	 * @throws \EventEspresso\Core\Exceptions\InvalidClassException
-	 * @throws \EventEspresso\Core\Exceptions\InvalidInterfaceException
-	 * @throws \EventEspresso\Core\Exceptions\InvalidDataTypeException
-	 * @throws \EventEspresso\Core\Exceptions\InvalidEntityException
-	 * @throws \EventEspresso\Core\Exceptions\InvalidIdentifierException
+	 * @throws \EventEspresso\core\exceptions\BaseException
+	 * @throws \EventEspresso\core\exceptions\InvalidClassException
+	 * @throws \EventEspresso\core\exceptions\InvalidInterfaceException
+	 * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
+	 * @throws \EventEspresso\core\exceptions\InvalidEntityException
+	 * @throws \EventEspresso\core\exceptions\InvalidIdentifierException
 	 * @throws \InvalidArgumentException
 	 */
 	public static function process_attendee_selections( \Registrations_Admin_Page $admin_page ) {
@@ -429,12 +429,12 @@ class EED_Attendee_Mover extends EED_Module {
 	 *
 	 * @access protected
 	 * @param  \Registrations_Admin_Page $admin_page
-	 * @throws \EventEspresso\Core\Exceptions\BaseException
-	 * @throws \EventEspresso\Core\Exceptions\InvalidClassException
-	 * @throws \EventEspresso\Core\Exceptions\InvalidInterfaceException
-	 * @throws \EventEspresso\Core\Exceptions\InvalidDataTypeException
-	 * @throws \EventEspresso\Core\Exceptions\InvalidEntityException
-	 * @throws \EventEspresso\Core\Exceptions\InvalidIdentifierException
+	 * @throws \EventEspresso\core\exceptions\BaseException
+	 * @throws \EventEspresso\core\exceptions\InvalidClassException
+	 * @throws \EventEspresso\core\exceptions\InvalidInterfaceException
+	 * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
+	 * @throws \EventEspresso\core\exceptions\InvalidEntityException
+	 * @throws \EventEspresso\core\exceptions\InvalidIdentifierException
 	 * @throws \InvalidArgumentException
 	 */
 	protected function _process_attendee_selections( \Registrations_Admin_Page $admin_page ) {
