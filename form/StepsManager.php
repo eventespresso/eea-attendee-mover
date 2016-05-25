@@ -1,5 +1,5 @@
 <?php
-namespace AttendeeMover\form;
+namespace EventEspresso\AttendeeMover\form;
 
 use EventEspresso\core\exceptions\InvalidClassException;
 use EventEspresso\core\exceptions\InvalidDataTypeException;
@@ -79,12 +79,12 @@ class StepsManager extends SequentialStepFormManager {
 			$loader = new CollectionLoader(
 				new CollectionDetails(
 					'attendee_mover_form_steps',
-					'\AttendeeMover\form\Step',
+					'\EventEspresso\AttendeeMover\form\Step',
 					array(
-						'\AttendeeMover\form\SelectEvent',
-						'\AttendeeMover\form\SelectTicket',
-						'\AttendeeMover\form\VerifyChanges',
-						'\AttendeeMover\form\Complete',
+						'\EventEspresso\AttendeeMover\form\SelectEvent',
+						'\EventEspresso\AttendeeMover\form\SelectTicket',
+						'\EventEspresso\AttendeeMover\form\VerifyChanges',
+						'\EventEspresso\AttendeeMover\form\Complete',
 					),
 					array(),
 					'',
