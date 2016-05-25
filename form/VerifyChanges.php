@@ -8,7 +8,7 @@ use EE_Form_Section_Proper;
 use EED_Attendee_Mover;
 use EEH_HTML;
 use InvalidArgumentException;
-use EventEspresso\Core\Exceptions\InvalidDataTypeException;
+use EventEspresso\core\exceptions\InvalidDataTypeException;
 
 if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
 	exit( 'No direct script access allowed' );
@@ -29,7 +29,7 @@ class VerifyChanges extends Step {
 	/**
 	 * SelectTicket constructor
 	 *
-	 * @throws \EventEspresso\Core\Exceptions\InvalidDataTypeException
+	 * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
 	 * @throws \InvalidArgumentException
 	 * @throws \DomainException
 	 */
@@ -64,7 +64,7 @@ class VerifyChanges extends Step {
 	 * creates and returns the actual form
 	 *
 	 * @return EE_Form_Section_Proper
-	 * @throws \EventEspresso\Core\Exceptions\EntityNotFoundException
+	 * @throws \EventEspresso\core\exceptions\EntityNotFoundException
 	 * @throws \LogicException
 	 * @throws \EE_Error
 	 */
@@ -174,9 +174,9 @@ class VerifyChanges extends Step {
 	 * @param array $form_data
 	 * @return bool
 	 * @throws \LogicException
-	 * @throws \EventEspresso\Core\Exceptions\InvalidFormSubmissionException
+	 * @throws \EventEspresso\core\exceptions\InvalidFormSubmissionException
 	 * @throws \EE_Error
-	 * @throws \EventEspresso\Core\Exceptions\EntityNotFoundException
+	 * @throws \EventEspresso\core\exceptions\EntityNotFoundException
 	 * @throws \InvalidArgumentException
 	 * @throws InvalidDataTypeException
 	 */
