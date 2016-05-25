@@ -1,5 +1,5 @@
 <?php
-namespace AttendeeMover\form;
+namespace EventEspresso\AttendeeMover\form;
 
 use EE_Admin_Page;
 use EE_Error;
