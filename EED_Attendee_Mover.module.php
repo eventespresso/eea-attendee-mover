@@ -45,7 +45,7 @@ class EED_Attendee_Mover extends EED_Module {
 	  *  @return 	void
 	  */
 	 public static function set_hooks_admin() {
-		 EE_Psr4AutoloaderInit::psr4_loader()->addNamespace( 'AttendeeMover', __DIR__ );
+		 EE_Psr4AutoloaderInit::psr4_loader()->addNamespace( 'EventEspresso\AttendeeMover', __DIR__ );
 		 add_action(
 			 'FHEE__EE_Admin_Page___load_page_dependencies__after_load__espresso_registrations__edit_attendee_selections',
 			 array( 'EED_Attendee_Mover', 'edit_attendee_selections_init' )
@@ -305,17 +305,17 @@ class EED_Attendee_Mover extends EED_Module {
 
 	/**
 	 * @param bool $process
-	 * @return \AttendeeMover\form\StepsManager
+	 * @return \EventEspresso\AttendeeMover\form\StepsManager
 	 * @throws \EventEspresso\core\exceptions\BaseException
 	 * @throws \InvalidArgumentException
 	 * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
 	 */
 	public function get_form_steps_manager( $process = true ) {
 		static $form_steps_manager = null;
-		if ( ! $form_steps_manager instanceof \AttendeeMover\form\StepsManager ) {
+		if ( ! $form_steps_manager instanceof \EventEspresso\AttendeeMover\form\StepsManager ) {
 			$request = EE_Registry::instance()->load_core( 'Request' );
 			$REG_ID = absint( $request->get( '_REG_ID', 0 ) );
-			$form_steps_manager = new \AttendeeMover\form\StepsManager(
+			$form_steps_manager = new \EventEspresso\AttendeeMover\form\StepsManager(
 				// base redirect URL
 				EED_Attendee_Mover::get_edit_attendee_selections_url( $REG_ID, $process ),
 				// default step slug
