@@ -1,13 +1,12 @@
 <?php
 namespace AttendeeMover\form;
 
-use EventEspresso\Core\Exceptions\BaseException;
-use EventEspresso\Core\Exceptions\InvalidClassException;
-use EventEspresso\Core\Exceptions\InvalidDataTypeException;
-use EventEspresso\Core\Exceptions\InvalidEntityException;
-use EventEspresso\Core\Exceptions\InvalidFilePathException;
-use EventEspresso\Core\Exceptions\InvalidIdentifierException;
-use EventEspresso\Core\Exceptions\InvalidInterfaceException;
+use EventEspresso\core\exceptions\InvalidClassException;
+use EventEspresso\core\exceptions\InvalidDataTypeException;
+use EventEspresso\core\exceptions\InvalidEntityException;
+use EventEspresso\core\exceptions\InvalidFilePathException;
+use EventEspresso\core\exceptions\InvalidIdentifierException;
+use EventEspresso\core\exceptions\InvalidInterfaceException;
 use EventEspresso\core\libraries\form_sections\FormHandler;
 use EventEspresso\core\libraries\form_sections\SequentialStepFormManager;
 use EventEspresso\core\services\collections\Collection;
@@ -44,7 +43,6 @@ class StepsManager extends SequentialStepFormManager {
 	 * @param \EE_Request $request
 	 * @throws InvalidDataTypeException
 	 * @throws InvalidArgumentException
-	 * @throws BaseException
 	 */
 	public function __construct(
 		$base_url,
