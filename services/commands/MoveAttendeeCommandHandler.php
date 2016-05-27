@@ -1,7 +1,11 @@
 <?php
 namespace EventEspresso\AttendeeMover\services;
 
+use EventEspresso\AttendeeMover\services\commands\MoveAttendeeCommand;
 use EventEspresso\core\exceptions\EntityNotFoundException;
+use EventEspresso\core\exceptions\InvalidEntityException;
+use EventEspresso\core\services\commands\CommandHandlerInterface;
+use EventEspresso\core\services\commands\CommandInterface;
 use EventEspresso\core\services\registration\Cancel;
 use EventEspresso\core\services\registration\Copy;
 use EventEspresso\core\services\registration\Create;
@@ -20,23 +24,31 @@ if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
  * @author        Brent Christensen
  * @since         $VID:$
  */
-class MoveAttendee {
+class MoveAttendeeCommandHandler implements CommandHandlerInterface
+{
 
 	/**
-	 * @param \EE_Registration $old_registration
-	 * @param \EE_Ticket       $new_ticket
+	 * @param CommandInterface $command
 	 * @throws \EE_Error
 	 * @throws \RuntimeException
 	 * @throws \EventEspresso\core\exceptions\EntityNotFoundException
 	 * @throws \EventEspresso\core\exceptions\UnexpectedEntityException
 	 * @throws \OutOfRangeException
+	 * @return mixed
 	 */
-	public static function process( \EE_Registration $old_registration, \EE_Ticket $new_ticket ) {
+	public function handle( CommandInterface $command )
+	{
+		/** @var MoveAttendeeCommand $command */
+		if ( ! $command instanceof MoveAttendeeCommand ) {
+			throw new InvalidEntityException( get_class( $command ), 'MoveAttendeeCommand' );
+		}
+		$old_registration = $command->registration();
+		$new_ticket = $command->ticket();
 		// have we already processed this registration change ? if so, then bail...
-		MoveAttendee::checkIfRegistrationChangeAlreadyProcessed( $old_registration, $new_ticket );
+		$this->checkIfRegistrationChangeAlreadyProcessed( $old_registration, $new_ticket );
 		$old_ticket = $old_registration->ticket();
 		// get transaction for original registration
-		$transaction = MoveAttendee::getTransaction( $old_registration );
+		$transaction = $this->getTransaction( $old_registration );
 		// apply any applicable promotions that were initially used during registration to new line items
 		// do_action(
 		// 	'AHEE__\AttendeeMover\form\Complete__process__new_ticket_line_item_added',
@@ -80,7 +92,7 @@ class MoveAttendee {
 	 * @throws \RuntimeException
 	 * @throws \EE_Error
 	 */
-	protected static function checkIfRegistrationChangeAlreadyProcessed(
+	protected function checkIfRegistrationChangeAlreadyProcessed(
 		\EE_Registration $registration,
 		\EE_Ticket $new_ticket
 	) {
@@ -114,7 +126,8 @@ class MoveAttendee {
 	 * @return \EE_Transaction
 	 * @throws \EventEspresso\core\exceptions\EntityNotFoundException
 	 */
-	protected static function getTransaction( \EE_Registration $registration ) {
+	protected function getTransaction( \EE_Registration $registration )
+	{
 		$transaction = $registration->transaction();
 		if ( ! $transaction instanceof \EE_Transaction ) {
 			throw new EntityNotFoundException( 'Transaction ID', $registration->transaction_ID() );
@@ -122,5 +135,5 @@ class MoveAttendee {
 		return $transaction;
 	}
 }
-// End of file MoveAttendee.php
-// Location: /MoveAttendee.php
+// End of file MoveAttendeeCommandHandler.php
+// Location: /MoveAttendeeCommandHandler.php
