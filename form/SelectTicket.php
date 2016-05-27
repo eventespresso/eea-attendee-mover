@@ -5,8 +5,6 @@ use EE_Datetime;
 use EE_Event;
 use EE_Form_Section_Proper;
 use EE_Ticket;
-use EventEspresso\core\exceptions\EntityNotFoundException;
-use Exception;
 use InvalidArgumentException;
 use EventEspresso\core\exceptions\InvalidDataTypeException;
 
