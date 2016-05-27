@@ -1,7 +1,6 @@
 <?php
-namespace EventEspresso\AttendeeMover\services;
+namespace EventEspresso\AttendeeMover\services\commands;
 
-use EventEspresso\AttendeeMover\services\commands\MoveAttendeeCommand;
 use EventEspresso\core\exceptions\EntityNotFoundException;
 use EventEspresso\core\exceptions\InvalidEntityException;
 use EventEspresso\core\services\commands\CommandHandlerInterface;
@@ -18,7 +17,9 @@ if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
 
 /**
  * Class MoveAttendee
- * Description
+ * receives a MoveAttendeeCommand object via the handle() method,
+ * which must contains valid registration and ticket objects,
+ * and returns a new registration
  *
  * @package       Event Espresso
  * @author        Brent Christensen
@@ -136,4 +137,4 @@ class MoveAttendeeCommandHandler implements CommandHandlerInterface
 	}
 }
 // End of file MoveAttendeeCommandHandler.php
-// Location: /MoveAttendeeCommandHandler.php
+// Location: wp-content/plugins/eea-attendee-mover/services/commands/MoveAttendeeCommandHandler.php
