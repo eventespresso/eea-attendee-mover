@@ -36,6 +36,7 @@ class EED_Attendee_Mover extends EED_Module {
 	  *  @return 	void
 	  */
 	 public static function set_hooks() {
+		 EED_Attendee_Mover::register_namespace_and_dependencies();
 	 }
 
 	 /**
@@ -45,7 +46,7 @@ class EED_Attendee_Mover extends EED_Module {
 	  *  @return 	void
 	  */
 	 public static function set_hooks_admin() {
-		 EE_Psr4AutoloaderInit::psr4_loader()->addNamespace( 'EventEspresso\AttendeeMover', __DIR__ );
+		 EED_Attendee_Mover::register_namespace_and_dependencies();
 		 add_action(
 			 'FHEE__EE_Admin_Page___load_page_dependencies__after_load__espresso_registrations__edit_attendee_selections',
 			 array( 'EED_Attendee_Mover', 'edit_attendee_selections_init' )
@@ -77,7 +78,20 @@ class EED_Attendee_Mover extends EED_Module {
 
 
 
-	 public static function get_attendee_mover(){
+	/**
+	 * register_namespace_and_dependencies
+	 */
+	public static function register_namespace_and_dependencies() {
+		EE_Psr4AutoloaderInit::psr4_loader()->addNamespace( 'EventEspresso\AttendeeMover', __DIR__ );
+		EE_Dependency_Map::register_dependencies(
+			'EventEspresso\AttendeeMover\form\Complete',
+			array( 'CommandBus' => EE_Dependency_Map::load_from_cache )
+		);
+	}
+
+
+
+	public static function get_attendee_mover(){
 		 echo json_encode( array( 'response' => 'ok', 'details' => 'you have made an ajax request!') );
 		 die;
 	 }
