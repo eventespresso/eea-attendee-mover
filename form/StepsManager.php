@@ -79,12 +79,12 @@ class StepsManager extends SequentialStepFormManager {
 			$loader = new CollectionLoader(
 				new CollectionDetails(
 					'attendee_mover_form_steps',
-					'\EventEspresso\AttendeeMover\form\Step',
+					'EventEspresso\AttendeeMover\form\Step',
 					array(
-						'\EventEspresso\AttendeeMover\form\SelectEvent',
-						'\EventEspresso\AttendeeMover\form\SelectTicket',
-						'\EventEspresso\AttendeeMover\form\VerifyChanges',
-						'\EventEspresso\AttendeeMover\form\Complete',
+						'EventEspresso\AttendeeMover\form\SelectEvent',
+						'EventEspresso\AttendeeMover\form\SelectTicket',
+						'EventEspresso\AttendeeMover\form\VerifyChanges',
+						'EventEspresso\AttendeeMover\form\Complete',
 					),
 					array(),
 					'',
