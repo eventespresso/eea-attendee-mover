@@ -1,7 +1,9 @@
 <?php
 namespace EventEspresso\AttendeeMover\form;
 
-use AttendeeMover\services\MoveAttendee;
+use EventEspresso\AttendeeMover\services\commands\MoveAttendeeCommand;
+use EventEspresso\core\libraries\form_sections\FormHandler;
+use EventEspresso\core\services\commands\CommandBus;
 
 if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
 	exit( 'No direct script access allowed' );
@@ -24,18 +26,19 @@ class Complete extends Step
 	/**
 	 * SelectTicket constructor
 	 *
-	 * @throws \InvalidArgumentException
-	 * @throws \DomainException
-	 * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
+	 * @param CommandBus $command_bus
 	 */
-	public function __construct()
+	public function __construct( CommandBus $command_bus )
 	{
 		$this->setDisplayable();
 		parent::__construct(
 			4,
 			__( 'Complete', 'event_espresso' ),
 			__( '"Complete" Attendee Mover Step', 'event_espresso' ),
-			'complete'
+			'complete',
+			'',
+			FormHandler::ADD_FORM_TAGS_AND_SUBMIT,
+			$command_bus
 		);
 		$this->REG_ID = $this->getRegId();
 		$this->EVT_ID = $this->getEventId();
@@ -106,9 +109,12 @@ class Complete extends Step
 	{
 		$old_registration = $this->getRegistration( $this->REG_ID );
 		$new_ticket = $this->getTicket( $this->TKT_ID );
-		$new_registration = MoveAttendee::process(
-			$old_registration,
-			$new_ticket
+
+		$new_registration = $this->command_bus->execute(
+			new MoveAttendeeCommand(
+				$old_registration,
+				$new_ticket
+			)
 		);
 		// setup redirect to new registration details admin page
 		$this->setRedirectUrl( REG_ADMIN_URL );
