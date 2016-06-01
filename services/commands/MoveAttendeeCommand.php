@@ -1,7 +1,6 @@
 <?php
 namespace EventEspresso\AttendeeMover\services\commands;
 
-use EventEspresso\core\exceptions\InvalidEntityException;
 use EventEspresso\core\services\commands\CommandInterface;
 
 if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
