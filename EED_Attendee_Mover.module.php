@@ -1,5 +1,5 @@
 <?php
-use EventEspresso\core\libraries\form_sections\FormHandler;
+use EventEspresso\core\libraries\form_sections\form_handlers\FormHandler;
 
 if ( ! defined( 'EVENT_ESPRESSO_VERSION')) { exit('No direct script access allowed'); }
 /**
@@ -83,10 +83,17 @@ class EED_Attendee_Mover extends EED_Module {
 	 */
 	public static function register_namespace_and_dependencies() {
 		EE_Psr4AutoloaderInit::psr4_loader()->addNamespace( 'EventEspresso\AttendeeMover', __DIR__ );
-		EE_Dependency_Map::register_dependencies(
-			'EventEspresso\AttendeeMover\form\Complete',
-			array( 'CommandBus' => EE_Dependency_Map::load_from_cache )
-		);
+		if (
+			! EE_Dependency_Map::register_dependencies(
+				'EventEspresso\AttendeeMover\form\Complete',
+				array( 'CommandBusInterface' => EE_Dependency_Map::load_from_cache )
+			)
+		) {
+			EE_Error::add_error(
+				__( 'Could not register dependencies for "EventEspresso\AttendeeMover\form\Complete"', 'event_espresso' ),
+				__FILE__, __FUNCTION__, __LINE__
+			);
+		}
 	}
 
 
