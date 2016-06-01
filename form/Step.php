@@ -8,7 +8,7 @@ use EEM_Event;
 use EEM_Registration;
 use EEM_Ticket;
 use EventEspresso\core\exceptions\EntityNotFoundException;
-use EventEspresso\core\libraries\form_sections\SequentialStepForm;
+use EventEspresso\core\libraries\form_sections\form_handlers\SequentialStepForm;
 
 if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
 	exit( 'No direct script access allowed' );
