@@ -2,8 +2,8 @@
 namespace EventEspresso\AttendeeMover\form;
 
 use EventEspresso\AttendeeMover\services\commands\MoveAttendeeCommand;
-use EventEspresso\core\libraries\form_sections\FormHandler;
-use EventEspresso\core\services\commands\CommandBus;
+use EventEspresso\core\libraries\form_sections\form_handlers\FormHandler;
+use EventEspresso\core\services\commands\CommandBusInterface;
 
 if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
 	exit( 'No direct script access allowed' );
@@ -25,10 +25,11 @@ class Complete extends Step
 
 	/**
 	 * SelectTicket constructor
-	 *
-	 * @param CommandBus $command_bus
+	 
+	 * 
+*@param CommandBusInterface $command_bus
 	 */
-	public function __construct( CommandBus $command_bus )
+	public function __construct( CommandBusInterface $command_bus )
 	{
 		$this->setDisplayable();
 		parent::__construct(
