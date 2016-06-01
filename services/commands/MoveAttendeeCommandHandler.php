@@ -4,6 +4,7 @@ namespace EventEspresso\AttendeeMover\services\commands;
 use EventEspresso\core\exceptions\EntityNotFoundException;
 use EventEspresso\core\exceptions\InvalidEntityException;
 use EventEspresso\core\services\commands\CommandHandlerInterface;
+use EventEspresso\core\services\commands\CommandHandlerPermissionsException;
 use EventEspresso\core\services\commands\CommandInterface;
 use EventEspresso\core\services\registration\Cancel;
 use EventEspresso\core\services\registration\Copy;
@@ -30,34 +31,35 @@ class MoveAttendeeCommandHandler implements CommandHandlerInterface
 
 	/**
 	 * @param CommandInterface $command
-	 * @throws \EE_Error
+	 * @param \EE_Capabilities $capabilities
 	 * @throws \RuntimeException
 	 * @throws \EventEspresso\core\exceptions\EntityNotFoundException
 	 * @throws \EventEspresso\core\exceptions\UnexpectedEntityException
 	 * @throws \OutOfRangeException
 	 * @return mixed
 	 */
-	public function handle( CommandInterface $command )
+	public function handle( CommandInterface $command, \EE_Capabilities $capabilities )
 	{
 		/** @var MoveAttendeeCommand $command */
 		if ( ! $command instanceof MoveAttendeeCommand ) {
 			throw new InvalidEntityException( get_class( $command ), 'MoveAttendeeCommand' );
 		}
 		$old_registration = $command->registration();
+		if (
+			! $capabilities->current_user_can(
+				'ee_edit_registrations',
+				'edit_registration_ticket_selection',
+				$old_registration
+			)
+		) {
+			throw new CommandHandlerPermissionsException( 'Edit Registration Ticket Selection');
+		}
 		$new_ticket = $command->ticket();
 		// have we already processed this registration change ? if so, then bail...
 		$this->checkIfRegistrationChangeAlreadyProcessed( $old_registration, $new_ticket );
 		$old_ticket = $old_registration->ticket();
 		// get transaction for original registration
 		$transaction = $this->getTransaction( $old_registration );
-		// apply any applicable promotions that were initially used during registration to new line items
-		// do_action(
-		// 	'AHEE__\AttendeeMover\form\Complete__process__new_ticket_line_item_added',
-		// 	$new_ticket_line_item,
-		// 	$new_ticket,
-		// 	$old_ticket,
-		// 	$old_registration
-		// );
 		// create new registration and it's associated line items
 		$new_registration = Create::registrationAndLineItemForTransaction(
 			$transaction,
