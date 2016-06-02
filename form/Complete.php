@@ -3,6 +3,7 @@ namespace EventEspresso\AttendeeMover\form;
 
 use EventEspresso\core\exceptions\InvalidEntityException;
 use EventEspresso\core\libraries\form_sections\form_handlers\FormHandler;
+use EventEspresso\core\libraries\form_sections\form_handlers\SequentialStepForm;
 
 if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
 	exit( 'No direct script access allowed' );
@@ -109,6 +110,9 @@ class Complete extends Step
 	 */
 	public function process( $form_data = array() )
 	{
+		// in case an exception is thrown, we need to go back to the previous step,
+		// because this step has no displayable content
+		$this->setRedirectTo( SequentialStepForm::REDIRECT_TO_PREV_STEP );
 		$old_registration = $this->getRegistration( $this->REG_ID );
 		$new_ticket = $this->getTicket( $this->TKT_ID );
 
@@ -129,6 +133,8 @@ class Complete extends Step
 				'_REG_ID' => $new_registration->ID()
 			)
 		);
+		// and update the redirectTo constant as well
+		$this->setRedirectTo( SequentialStepForm::REDIRECT_TO_OTHER );
 		\EE_Error::add_success(
 			sprintf(
 				__(
