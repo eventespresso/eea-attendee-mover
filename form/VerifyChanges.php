@@ -103,44 +103,44 @@ class VerifyChanges extends Step {
 									\EEH_HTML::tr(
 										\EEH_HTML::td(
 											$registration->attendee()->name(),
-											'id1',
-											'class',
-											'style',
+											'',
+											'am-attendee-name-td',
+											'',
 											'data-th="' . $th1 . '"'
 										) .
 										\EEH_HTML::td(
 											$old_event->name(),
-											'id2',
-											'class',
-											'style',
+											'',
+											'am-old-event-name-td',
+											'',
 											'data-th="' . $th2 . '"'
 										) .
 										\EEH_HTML::td(
 											$old_ticket->name_and_info(),
-											'id3',
-											'class',
-											'style',
+											'',
+											'am-old-ticket-name-td',
+											'',
 											'data-th="' . $th3 . '"'
 										) .
 										\EEH_HTML::td(
 											$new_event->name(),
-											'id4',
-											'class',
-											'style',
+											'',
+											'am-new-event-name-td',
+											'',
 											'data-th="' . $th4 . '"'
 										) .
 										\EEH_HTML::td(
 											$new_ticket->name_and_info(),
-											'id5',
-											'class',
-											'style',
+											'',
+											'am-new-ticket-name-td',
+											'',
 											'data-th="' . $th5 . '"'
 										) .
 										\EEH_HTML::td(
 											\EEH_Template::format_currency( $price_change ),
-											'id6',
-											'jst-rght' . $price_class,
-											'style',
+											'',
+											'am-price-change-td jst-rght' . $price_class,
+											'',
 											'data-th="' . $th6 . '"'
 										)
 									)
