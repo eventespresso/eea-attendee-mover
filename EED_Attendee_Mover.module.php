@@ -80,54 +80,41 @@ class EED_Attendee_Mover extends EED_Module {
 	 */
 	public static function register_namespace_and_dependencies() {
 		EE_Psr4AutoloaderInit::psr4_loader()->addNamespace( 'EventEspresso\AttendeeMover', __DIR__ );
-		if (
-			! EE_Dependency_Map::register_dependencies(
-				'EventEspresso\AttendeeMover\form\Complete',
-				array( 'CommandBusInterface' => EE_Dependency_Map::load_from_cache )
+		$attendee_mover_dependencies = array(
+			'EventEspresso\AttendeeMover\form\SelectEvent' => array(
+				'EE_Registry' => EE_Dependency_Map::load_from_cache
+			),
+			'EventEspresso\AttendeeMover\form\SelectTicket' => array(
+				'EE_Registry' => EE_Dependency_Map::load_from_cache
+			),
+			'EventEspresso\AttendeeMover\form\VerifyChanges' => array(
+				'EE_Registry' => EE_Dependency_Map::load_from_cache
+			),
+			'EventEspresso\AttendeeMover\form\Complete' => array(
+				'EE_Registry' => EE_Dependency_Map::load_from_cache
+			),
+			'EventEspresso\AttendeeMover\services\commands\MoveAttendeeCommand' => array(
+				null,
+				null,
+				'CommandBusInterface' => EE_Dependency_Map::load_from_cache
+			),
+			'EventEspresso\AttendeeMover\services\commands\MoveAttendeeCommandHandler' => array(
+				'RegistrationsCapChecker' => EE_Dependency_Map::load_from_cache
 			)
-		) {
-			EE_Error::add_error(
-				__(
-					'Could not register dependencies for "EventEspresso\AttendeeMover\form\Complete"',
-					'event_espresso'
-				),
-				__FILE__, __FUNCTION__, __LINE__
-			);
+		);
+		foreach ( $attendee_mover_dependencies as $class => $dependencies ) {
+			if ( ! EE_Dependency_Map::register_dependencies( $class, $dependencies ) ) {
+				EE_Error::add_error(
+					sprintf(
+						__( 'Could not register dependencies for "%1$s"', 'event_espresso' ),
+						$class
+					),
+					__FILE__,
+					__FUNCTION__,
+					__LINE__
+				);
+			}
 		}
-		if (
-			! EE_Dependency_Map::register_dependencies(
-				'EventEspresso\AttendeeMover\services\commands\MoveAttendeeCommandHandler',
-				array(
-					'RegistrationsCapChecker' => EE_Dependency_Map::load_from_cache
-				)
-			)
-		) {
-			EE_Error::add_error(
-				__(
-					'Could not register dependencies for "EventEspresso\AttendeeMover\services\commands\MoveAttendeeCommandHandler"',
-					'event_espresso'
-				),
-				__FILE__, __FUNCTION__, __LINE__
-			);
-		}
-	}
-
-
-
-	/**
-	 *    config
-	 *
-	 * @return EE_Attendee_Mover_Config
-	 */
-	public function config(){
-		// config settings are setup up individually for EED_Modules via
-		// the EE_Configurable class that all modules inherit from,
-		// so $this->config();  can be used anywhere to retrieve it's config,
-		// and $this->_update_config( $EE_Config_Base_object ); can be used
-		// to supply an updated instance of it's config object to piggy back
-		// off of the config setup for the base EE_Attendee_Mover class,
-		// just use the following (note: updates would have to occur from within that class)
-		return EE_Registry::instance()->addons->EE_Attendee_Mover->config();
 	}
 
 
@@ -336,7 +323,6 @@ class EED_Attendee_Mover extends EED_Module {
 	/**
 	 * @param bool $process
 	 * @return \EventEspresso\AttendeeMover\form\StepsManager
-	 * @throws \EventEspresso\core\exceptions\BaseException
 	 * @throws \InvalidArgumentException
 	 * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
 	 */
@@ -381,7 +367,6 @@ class EED_Attendee_Mover extends EED_Module {
 	 * @throws \EventEspresso\core\exceptions\InvalidIdentifierException
 	 * @throws \EventEspresso\core\exceptions\InvalidEntityException
 	 * @throws \EventEspresso\core\exceptions\InvalidClassException
-	 * @throws \EventEspresso\core\exceptions\BaseException
 	 * @throws \InvalidArgumentException
 	 * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
 	 */
@@ -409,7 +394,6 @@ class EED_Attendee_Mover extends EED_Module {
 	 *
 	 * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
 	 * @throws \InvalidArgumentException
-	 * @throws \EventEspresso\core\exceptions\BaseException
 	 */
 	public static function edit_attendee_selections_meta_box() {
 		EED_Attendee_Mover::instance()->_edit_attendee_selections_meta_box();
@@ -422,7 +406,6 @@ class EED_Attendee_Mover extends EED_Module {
 	 *
 	 * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
 	 * @throws \InvalidArgumentException
-	 * @throws \EventEspresso\core\exceptions\BaseException
 	 */
 	public function _edit_attendee_selections_meta_box() {
 		$form_steps_manager = $this->get_form_steps_manager();
@@ -439,7 +422,6 @@ class EED_Attendee_Mover extends EED_Module {
 	 *
 	 * @access    public
 	 * @param \Registrations_Admin_Page $admin_page
-	 * @throws \EventEspresso\core\exceptions\BaseException
 	 * @throws \EventEspresso\core\exceptions\InvalidClassException
 	 * @throws \EventEspresso\core\exceptions\InvalidInterfaceException
 	 * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
@@ -459,7 +441,6 @@ class EED_Attendee_Mover extends EED_Module {
 	 *
 	 * @access protected
 	 * @param  \Registrations_Admin_Page $admin_page
-	 * @throws \EventEspresso\core\exceptions\BaseException
 	 * @throws \EventEspresso\core\exceptions\InvalidClassException
 	 * @throws \EventEspresso\core\exceptions\InvalidInterfaceException
 	 * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
