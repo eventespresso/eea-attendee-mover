@@ -71,9 +71,6 @@ class EED_Attendee_Mover extends EED_Module {
 			 array( 'EED_Attendee_Mover', 'attendee_mover_page_config' ),
 			 10, 2
 		 );
-		 // ajax hooks
-		 add_action( 'wp_ajax_get_attendee_mover', array( 'EED_Attendee_Mover', 'get_attendee_mover' ) );
-		 add_action( 'wp_ajax_nopriv_get_attendee_mover', array( 'EED_Attendee_Mover', 'get_attendee_mover' ) );
 	 }
 
 
@@ -114,13 +111,6 @@ class EED_Attendee_Mover extends EED_Module {
 			);
 		}
 	}
-
-
-
-	public static function get_attendee_mover(){
-		 echo json_encode( array( 'response' => 'ok', 'details' => 'you have made an ajax request!') );
-		 die;
-	 }
 
 
 
@@ -499,16 +489,7 @@ class EED_Attendee_Mover extends EED_Module {
 			'espresso_attendee_mover',
 			EE_ATTENDEE_MOVER_URL . 'css/espresso_attendee_mover.css'
 		);
-		// attendee_mover script
-		wp_register_script(
-			'espresso_attendee_mover',
-			EE_ATTENDEE_MOVER_URL . 'scripts/espresso_attendee_mover.js',
-			array( 'jquery' ),
-			EE_ATTENDEE_MOVER_VERSION,
-			TRUE
-		);
 		wp_enqueue_style( 'espresso_attendee_mover' );
-		wp_enqueue_script( 'espresso_attendee_mover' );
 	}
 
 
