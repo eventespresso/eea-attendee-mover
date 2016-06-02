@@ -26,6 +26,9 @@ class Complete extends Step
 	 * SelectTicket constructor
 	 *
 	 * @param \EE_Registry $registry
+	 * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
+	 * @throws \InvalidArgumentException
+	 * @throws \DomainException
 	 */
 	public function __construct( \EE_Registry $registry )
 	{
