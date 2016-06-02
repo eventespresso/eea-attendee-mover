@@ -3,8 +3,9 @@ namespace EventEspresso\AttendeeMover\services\commands;
 
 use EventEspresso\core\exceptions\EntityNotFoundException;
 use EventEspresso\core\exceptions\InvalidEntityException;
+use EventEspresso\core\exceptions\InsufficientPermissionsException;
+use EventEspresso\core\services\capabilities\RegistrationsCapChecker;
 use EventEspresso\core\services\commands\CommandHandlerInterface;
-use EventEspresso\core\services\commands\CommandHandlerPermissionsException;
 use EventEspresso\core\services\commands\CommandInterface;
 use EventEspresso\core\services\registration\Cancel;
 use EventEspresso\core\services\registration\Copy;
@@ -30,30 +31,40 @@ class MoveAttendeeCommandHandler implements CommandHandlerInterface
 {
 
 	/**
+	 * @var RegistrationsCapChecker $cap_checker
+	 */
+	private $cap_checker;
+
+
+
+	/**
+	 * MoveAttendeeCommandHandler constructor.
+	 *
+	 * @param RegistrationsCapChecker $cap_checker
+	 */
+	public function __construct( RegistrationsCapChecker $cap_checker ) {
+		$this->cap_checker = $cap_checker;
+	}
+
+
+
+	/**
 	 * @param CommandInterface $command
-	 * @param \EE_Capabilities $capabilities
 	 * @throws \RuntimeException
 	 * @throws \EventEspresso\core\exceptions\EntityNotFoundException
 	 * @throws \EventEspresso\core\exceptions\UnexpectedEntityException
 	 * @throws \OutOfRangeException
 	 * @return mixed
 	 */
-	public function handle( CommandInterface $command, \EE_Capabilities $capabilities )
+	public function handle( CommandInterface $command )
 	{
 		/** @var MoveAttendeeCommand $command */
 		if ( ! $command instanceof MoveAttendeeCommand ) {
 			throw new InvalidEntityException( get_class( $command ), 'MoveAttendeeCommand' );
 		}
 		$old_registration = $command->registration();
-		if (
-			! $capabilities->current_user_can(
-				'ee_edit_registrations',
-				'edit_registration_ticket_selection',
-				$old_registration
-			)
-		) {
-			throw new CommandHandlerPermissionsException( 'Edit Registration Ticket Selection');
-		}
+		// You can DO IT !!! ... or err... maybe you can't !
+		$this->checkCapabilities( $old_registration );
 		$new_ticket = $command->ticket();
 		// have we already processed this registration change ? if so, then bail...
 		$this->checkIfRegistrationChangeAlreadyProcessed( $old_registration, $new_ticket );
@@ -78,12 +89,22 @@ class MoveAttendeeCommandHandler implements CommandHandlerInterface
 		/** @type \EE_Registration_Processor $registration_processor */
 		$registration_processor = \EE_Registry::instance()->load_class( 'Registration_Processor' );
 		$registration_processor->update_registration_status_and_trigger_notifications( $new_registration );
-		// tag the old registration as moved
-		$old_registration->add_extra_meta(
-			'registration-moved',
-			array( 'TKT_ID' => $new_ticket->ID(), 'NEW_REG_ID' => $new_registration->ID() )
-		);
+		// tag registrations for identification purposes
+		$this->addExtraMeta( $old_registration, $new_registration, $new_ticket );
 		return $new_registration;
+	}
+
+
+
+	/**
+	 * @param \EE_Registration $old_registration
+	 * @throws InsufficientPermissionsException
+	 */
+	protected function checkCapabilities( \EE_Registration $old_registration ) {
+		$this->cap_checker->editRegistrations(
+			$old_registration,
+			__( 'Edit Registration Ticket Selection', 'event_espresso' )
+		);
 	}
 
 
@@ -99,7 +120,7 @@ class MoveAttendeeCommandHandler implements CommandHandlerInterface
 		\EE_Registration $registration,
 		\EE_Ticket $new_ticket
 	) {
-		$reg_moved = $registration->get_extra_meta( 'registration-moved', true, array() );
+		$reg_moved = $registration->get_extra_meta( 'registration-moved-to', true, array() );
 		if ( isset( $reg_moved['TKT_ID'] ) && $reg_moved['TKT_ID'] === $new_ticket->ID() ) {
 			$reg_details_url = add_query_arg(
 				array(
@@ -137,6 +158,31 @@ class MoveAttendeeCommandHandler implements CommandHandlerInterface
 		}
 		return $transaction;
 	}
+
+
+
+	/**
+	 * @param \EE_Registration $old_registration
+	 * @param \EE_Registration $new_registration
+	 * @param \EE_Ticket       $new_ticket
+	 */
+	protected function addExtraMeta(
+		\EE_Registration $old_registration,
+		\EE_Registration $new_registration,
+		\EE_Ticket $new_ticket
+	) {
+		// tag the old registration as moved
+		$old_registration->add_extra_meta(
+			'registration-moved-to',
+			array( 'TKT_ID' => $new_ticket->ID(), 'NEW_REG_ID' => $new_registration->ID() )
+		);
+		// and the new registration as well
+		$new_registration->add_extra_meta(
+			'registration-moved-from',
+			array( 'TKT_ID' => $new_ticket->ID(), 'OLD_REG_ID' => $old_registration->ID() )
+		);
+	}
+
 }
 // End of file MoveAttendeeCommandHandler.php
 // Location: wp-content/plugins/eea-attendee-mover/services/commands/MoveAttendeeCommandHandler.php
