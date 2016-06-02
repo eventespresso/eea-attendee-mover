@@ -3,6 +3,7 @@ namespace EventEspresso\AttendeeMover\form;
 
 use EE_Form_Section_Proper;
 use EE_Error;
+use EventEspresso\core\libraries\form_sections\form_handlers\FormHandler;
 use LogicException;
 use InvalidArgumentException;
 use EventEspresso\core\exceptions\InvalidDataTypeException;
@@ -25,18 +26,22 @@ if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
 class SelectEvent extends Step {
 
 	/**
-	 * SelectEvent constructor.
+	 * SelectEvent constructor
 	 *
+	 * @param \EE_Registry $registry
 	 * @throws InvalidDataTypeException
 	 * @throws InvalidArgumentException
 	 * @throws \DomainException
 	 */
-	public function __construct() {
+	public function __construct( \EE_Registry $registry ) {
 		parent::__construct(
 			1,
 			__( 'Select Event', 'event_espresso' ),
 			__( '"Select Event" Attendee Mover Step', 'event_espresso' ),
-			'select_event'
+			'select_event',
+			'',
+			FormHandler::ADD_FORM_TAGS_AND_SUBMIT,
+			$registry
 		);
 	}
 
