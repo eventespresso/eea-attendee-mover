@@ -5,6 +5,7 @@ use EE_Datetime;
 use EE_Event;
 use EE_Form_Section_Proper;
 use EE_Ticket;
+use EventEspresso\core\libraries\form_sections\form_handlers\FormHandler;
 use InvalidArgumentException;
 use EventEspresso\core\exceptions\InvalidDataTypeException;
 
@@ -27,16 +28,20 @@ class SelectTicket extends Step {
 	/**
 	 * SelectTicket constructor
 	 *
+	 * @param \EE_Registry $registry
 	 * @throws InvalidDataTypeException
 	 * @throws InvalidArgumentException
 	 * @throws \DomainException
 	 */
-	public function __construct() {
+	public function __construct( \EE_Registry $registry ) {
 		parent::__construct(
 			2,
 			__( 'Select Ticket', 'event_espresso' ),
 			__( '"Select Ticket" Attendee Mover Step', 'event_espresso' ),
-			'select_ticket'
+			'select_ticket',
+			'',
+			FormHandler::ADD_FORM_TAGS_AND_SUBMIT,
+			$registry
 		);
 		$this->EVT_ID = $this->getEventId();
 		$this->addFormActionArgs( array( 'EVT_ID' => $this->EVT_ID) );
