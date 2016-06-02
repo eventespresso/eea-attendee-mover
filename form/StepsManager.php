@@ -78,17 +78,27 @@ class StepsManager extends SequentialStepFormManager {
 		if ( ! $form_steps instanceof Collection ) {
 			$loader = new CollectionLoader(
 				new CollectionDetails(
+					// collection name
 					'attendee_mover_form_steps',
+					// collection interface
 					'EventEspresso\AttendeeMover\form\Step',
-					array(
-						'EventEspresso\AttendeeMover\form\SelectEvent',
-						'EventEspresso\AttendeeMover\form\SelectTicket',
-						'EventEspresso\AttendeeMover\form\VerifyChanges',
-						'EventEspresso\AttendeeMover\form\Complete',
+					// FQCNs for classes to add
+					apply_filters(
+						'FHEE__EventEspresso\AttendeeMover\form\StepsManager__getFormStepsCollection__form_step_classes',
+						array(
+							'EventEspresso\AttendeeMover\form\SelectEvent',
+							'EventEspresso\AttendeeMover\form\SelectTicket',
+							'EventEspresso\AttendeeMover\form\VerifyChanges',
+							'EventEspresso\AttendeeMover\form\Complete',
+						)
 					),
+					// filepaths to classes to add
 					array(),
+					// filemask to use if parsing folder for files to add
 					'',
+					// what to use as identifier for collection entities
 					CollectionDetails::ID_CALLBACK_METHOD,
+					// we'll use the slug() method on our collection objects for setting the identifier
 					'slug'
 				)
 			);
