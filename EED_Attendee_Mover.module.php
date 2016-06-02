@@ -90,7 +90,26 @@ class EED_Attendee_Mover extends EED_Module {
 			)
 		) {
 			EE_Error::add_error(
-				__( 'Could not register dependencies for "EventEspresso\AttendeeMover\form\Complete"', 'event_espresso' ),
+				__(
+					'Could not register dependencies for "EventEspresso\AttendeeMover\form\Complete"',
+					'event_espresso'
+				),
+				__FILE__, __FUNCTION__, __LINE__
+			);
+		}
+		if (
+			! EE_Dependency_Map::register_dependencies(
+				'EventEspresso\AttendeeMover\services\commands\MoveAttendeeCommandHandler',
+				array(
+					'RegistrationsCapChecker' => EE_Dependency_Map::load_from_cache
+				)
+			)
+		) {
+			EE_Error::add_error(
+				__(
+					'Could not register dependencies for "EventEspresso\AttendeeMover\services\commands\MoveAttendeeCommandHandler"',
+					'event_espresso'
+				),
 				__FILE__, __FUNCTION__, __LINE__
 			);
 		}
