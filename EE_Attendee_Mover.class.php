@@ -27,13 +27,6 @@ Class  EE_Attendee_Mover extends EE_Addon {
 				'plugin_slug'           => 'attendee_mover',
 				'min_core_version'      => EE_ATTENDEE_MOVER_CORE_VERSION_REQUIRED,
 				'main_file_path'        => EE_ATTENDEE_MOVER_PLUGIN_FILE,
-				// 'admin_path'            => EE_ATTENDEE_MOVER_ADMIN,
-				'admin_callback'        => '',
-				'config_class'          => 'EE_Attendee_Mover_Config',
-				'config_name'           => 'EE_Attendee_Mover',
-				'autoloader_paths'      => array(
-					'EE_Attendee_Mover_Config'       => EE_ATTENDEE_MOVER_PATH . 'EE_Attendee_Mover_Config.php',
-				),
 				'module_paths'          => array( EE_ATTENDEE_MOVER_PATH . 'EED_Attendee_Mover.module.php' ),
 
 				'pue_options'           => array(
