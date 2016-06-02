@@ -24,7 +24,7 @@ if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
  *
  * @package       Event Espresso
  * @author        Brent Christensen
- * @since         $VID:$
+ * @since         1.0.0
  */
 class MoveAttendeeCommandHandler implements CommandHandlerInterface
 {
