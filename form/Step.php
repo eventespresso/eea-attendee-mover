@@ -47,7 +47,7 @@ abstract class Step extends SequentialStepForm {
 	 * @return int
 	 */
 	protected function getRegId() {
-		$request = \EE_Registry::instance()->load_core( 'Request' );
+		$request = $this->registry->load_core( 'Request' );
 		return absint( $request->get( '_REG_ID', 0 ) );
 	}
 
@@ -72,7 +72,7 @@ abstract class Step extends SequentialStepForm {
 	 * @return int
 	 */
 	protected function getEventId() {
-		$request = \EE_Registry::instance()->load_core( 'Request' );
+		$request = $this->registry->load_core( 'Request' );
 		return absint( $request->get( 'EVT_ID', 0 ) );
 	}
 
@@ -97,7 +97,7 @@ abstract class Step extends SequentialStepForm {
 	 * @return int
 	 */
 	protected function getTicketId() {
-		$request = \EE_Registry::instance()->load_core( 'Request' );
+		$request = $this->registry->load_core( 'Request' );
 		return absint( $request->get( 'TKT_ID', 0 ) );
 	}
 
