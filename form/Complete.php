@@ -1,9 +1,8 @@
 <?php
 namespace EventEspresso\AttendeeMover\form;
 
-use EventEspresso\AttendeeMover\services\commands\MoveAttendeeCommand;
+use EventEspresso\core\exceptions\InvalidEntityException;
 use EventEspresso\core\libraries\form_sections\form_handlers\FormHandler;
-use EventEspresso\core\services\commands\CommandBusInterface;
 
 if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
 	exit( 'No direct script access allowed' );
@@ -25,11 +24,10 @@ class Complete extends Step
 
 	/**
 	 * SelectTicket constructor
-	 
-	 * 
-*@param CommandBusInterface $command_bus
+	 *
+	 * @param \EE_Registry $registry
 	 */
-	public function __construct( CommandBusInterface $command_bus )
+	public function __construct( \EE_Registry $registry )
 	{
 		$this->setDisplayable();
 		parent::__construct(
@@ -39,7 +37,7 @@ class Complete extends Step
 			'complete',
 			'',
 			FormHandler::ADD_FORM_TAGS_AND_SUBMIT,
-			$command_bus
+			$registry
 		);
 		$this->REG_ID = $this->getRegId();
 		$this->EVT_ID = $this->getEventId();
@@ -111,12 +109,15 @@ class Complete extends Step
 		$old_registration = $this->getRegistration( $this->REG_ID );
 		$new_ticket = $this->getTicket( $this->TKT_ID );
 
-		$new_registration = $this->command_bus->execute(
-			new MoveAttendeeCommand(
-				$old_registration,
-				$new_ticket
+		$new_registration = $this->registry
+			->create(
+				'EventEspresso\AttendeeMover\services\commands\MoveAttendeeCommand',
+				array( $old_registration, $new_ticket )
 			)
-		);
+			->execute();
+		if ( ! $new_registration instanceof \EE_Registration ) {
+			throw new InvalidEntityException( $new_registration, 'EE_Registration' );
+		}
 		// setup redirect to new registration details admin page
 		$this->setRedirectUrl( REG_ADMIN_URL );
 		$this->addRedirectArgs(
