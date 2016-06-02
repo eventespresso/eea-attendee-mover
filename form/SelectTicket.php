@@ -33,7 +33,7 @@ class SelectTicket extends Step {
 	 */
 	public function __construct() {
 		parent::__construct(
-			2,
+			20,
 			__( 'Select Ticket', 'event_espresso' ),
 			__( '"Select Ticket" Attendee Mover Step', 'event_espresso' ),
 			'select_ticket'

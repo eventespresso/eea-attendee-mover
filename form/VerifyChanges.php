@@ -5,7 +5,6 @@ use EE_Admin_Page;
 use EE_Error;
 use EE_Form_Section_HTML;
 use EE_Form_Section_Proper;
-use EED_Attendee_Mover;
 use EEH_HTML;
 use InvalidArgumentException;
 use EventEspresso\core\exceptions\InvalidDataTypeException;
@@ -35,7 +34,7 @@ class VerifyChanges extends Step {
 	 */
 	public function __construct() {
 		parent::__construct(
-			3,
+			30,
 			__( 'Verify Changes', 'event_espresso' ),
 			__( '"Verify Changes" Attendee Mover Step', 'event_espresso' ),
 			'verify_changes'

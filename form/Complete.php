@@ -25,15 +25,15 @@ class Complete extends Step
 
 	/**
 	 * SelectTicket constructor
-	 
-	 * 
+
+	 *
 *@param CommandBusInterface $command_bus
 	 */
 	public function __construct( CommandBusInterface $command_bus )
 	{
 		$this->setDisplayable();
 		parent::__construct(
-			4,
+			40,
 			__( 'Complete', 'event_espresso' ),
 			__( '"Complete" Attendee Mover Step', 'event_espresso' ),
 			'complete',
