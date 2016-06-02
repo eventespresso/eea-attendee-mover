@@ -42,7 +42,8 @@ class MoveAttendeeCommandHandler implements CommandHandlerInterface
 	 *
 	 * @param RegistrationsCapChecker $cap_checker
 	 */
-	public function __construct( RegistrationsCapChecker $cap_checker ) {
+	public function __construct( RegistrationsCapChecker $cap_checker )
+	{
 		$this->cap_checker = $cap_checker;
 	}
 
@@ -100,7 +101,8 @@ class MoveAttendeeCommandHandler implements CommandHandlerInterface
 	 * @param \EE_Registration $old_registration
 	 * @throws InsufficientPermissionsException
 	 */
-	protected function checkCapabilities( \EE_Registration $old_registration ) {
+	protected function checkCapabilities( \EE_Registration $old_registration )
+	{
 		$this->cap_checker->editRegistrations(
 			$old_registration,
 			__( 'Edit Registration Ticket Selection', 'event_espresso' )
