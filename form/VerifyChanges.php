@@ -7,6 +7,7 @@ use EE_Form_Section_HTML;
 use EE_Form_Section_Proper;
 use EED_Attendee_Mover;
 use EEH_HTML;
+use EventEspresso\core\libraries\form_sections\form_handlers\FormHandler;
 use InvalidArgumentException;
 use EventEspresso\core\exceptions\InvalidDataTypeException;
 
@@ -29,16 +30,20 @@ class VerifyChanges extends Step {
 	/**
 	 * SelectTicket constructor
 	 *
+	 * @param \EE_Registry $registry
 	 * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
 	 * @throws \InvalidArgumentException
 	 * @throws \DomainException
 	 */
-	public function __construct() {
+	public function __construct( \EE_Registry $registry ) {
 		parent::__construct(
 			3,
 			__( 'Verify Changes', 'event_espresso' ),
 			__( '"Verify Changes" Attendee Mover Step', 'event_espresso' ),
-			'verify_changes'
+			'verify_changes',
+			'',
+			FormHandler::ADD_FORM_TAGS_AND_SUBMIT,
+			$registry
 		);
 
 		$this->REG_ID = $this->getRegId();
