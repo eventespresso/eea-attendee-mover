@@ -4,6 +4,7 @@ namespace EventEspresso\AttendeeMover\form;
 use EE_Form_Section_Proper;
 use EE_Error;
 use EventEspresso\core\libraries\form_sections\form_handlers\FormHandler;
+use EventEspresso\core\libraries\form_sections\form_handlers\SequentialStepForm;
 use LogicException;
 use InvalidArgumentException;
 use EventEspresso\core\exceptions\InvalidDataTypeException;
@@ -58,7 +59,7 @@ class SelectEvent extends Step {
 		$this->setForm(
 			new \EE_Form_Section_Proper(
 				array(
-					'name'          => $this->formName(),
+					'name'          => $this->slug(),
 					'subsections'   => array(
 						'EVT_ID' => new \EE_Select_Ajax_Model_Rest_Input(
 							array(
@@ -79,7 +80,8 @@ class SelectEvent extends Step {
 								),
 								'required'           => true,
 							)
-						)
+						),
+						'phoney' => new \EE_Phone_Input(),
 					)
 				)
 			)
@@ -102,6 +104,7 @@ class SelectEvent extends Step {
 	 * @throws InvalidDataTypeException
 	 */
 	public function process( $form_data = array() ) {
+		$form_data[ $this->slug() ]['phoney'] = '123456';
 		// process form
 		$valid_data = (array) parent::process( $form_data );
 		if ( empty( $valid_data ) ) {
@@ -111,6 +114,7 @@ class SelectEvent extends Step {
 		$EVT_ID = isset( $valid_data['EVT_ID' ] ) ? absint( $valid_data['EVT_ID' ] ) : 0;
 		if ( $EVT_ID ) {
 			$this->addRedirectArgs(  array( 'EVT_ID' => $EVT_ID ) );
+			$this->setRedirectTo( SequentialStepForm::REDIRECT_TO_NEXT_STEP );
 			return true;
 		}
 		return false;
