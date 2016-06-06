@@ -44,6 +44,48 @@ abstract class Step extends SequentialStepForm {
 
 
 	/**
+	 * SequentialStepForm constructor
+	 *
+	 * @param int          $order
+	 * @param string       $form_name
+	 * @param string       $admin_name
+	 * @param string       $slug
+	 * @param string       $form_action
+	 * @param string       $form_config
+	 * @param \EE_Registry $registry
+	 */
+	public function __construct(
+		$order,
+		$form_name,
+		$admin_name,
+		$slug,
+		$form_action = '',
+		$form_config = 'add_form_tags_and_submit',
+		\EE_Registry $registry
+	) {
+		parent::__construct( $order, $form_name, $admin_name, $slug, $form_action, $form_config, $registry );
+		$this->REG_ID = $this->getRegId();
+		$this->EVT_ID = $this->getEventId();
+		$this->TKT_ID = $this->getTicketId();
+		$this->addRedirectArgs(
+			array(
+				'_REG_ID' => $this->REG_ID,
+				'EVT_ID'  => $this->EVT_ID,
+				'TKT_ID'  => $this->TKT_ID,
+			)
+		);
+		$this->addFormActionArgs(
+			array(
+				'_REG_ID' => $this->REG_ID,
+				'EVT_ID'  => $this->EVT_ID,
+				'TKT_ID'  => $this->TKT_ID,
+			)
+		);
+	}
+
+
+
+	/**
 	 * @return int
 	 */
 	protected function getRegId() {
