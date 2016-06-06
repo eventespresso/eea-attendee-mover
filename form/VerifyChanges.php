@@ -8,6 +8,7 @@ use EE_Form_Section_Proper;
 use EED_Attendee_Mover;
 use EEH_HTML;
 use EventEspresso\core\libraries\form_sections\form_handlers\FormHandler;
+use EventEspresso\core\libraries\form_sections\form_handlers\SequentialStepForm;
 use InvalidArgumentException;
 use EventEspresso\core\exceptions\InvalidDataTypeException;
 
@@ -45,22 +46,6 @@ class VerifyChanges extends Step {
 			FormHandler::ADD_FORM_TAGS_AND_SUBMIT,
 			$registry
 		);
-
-		$this->REG_ID = $this->getRegId();
-		$this->EVT_ID = $this->getEventId();
-		$this->TKT_ID = $this->getTicketId();
-		$this->addRedirectArgs(
-			array(
-				'EVT_ID' => $this->EVT_ID,
-				'TKT_ID' => $this->TKT_ID,
-			)
-		);
-		$this->addFormActionArgs(
-			array(
-				'EVT_ID' => $this->EVT_ID,
-				'TKT_ID' => $this->TKT_ID,
-			)
-		);
 	}
 
 
@@ -90,7 +75,7 @@ class VerifyChanges extends Step {
 		$this->setForm(
 			new \EE_Form_Section_Proper(
 				array(
-					'name'        => $this->formName(),
+					'name'        => $this->slug(),
 					'subsections' => array(
 						'changes' => new EE_Form_Section_HTML(
 							\EEH_HTML::table(
@@ -193,7 +178,7 @@ class VerifyChanges extends Step {
 		if (
 			! (
 				isset( $valid_data['verify_changes-submit-btn'] )
-		         && $valid_data['verify_changes-submit-btn'] === __( 'Submit', 'event_espresso' )
+		         && $valid_data['verify_changes-submit-btn'] === $this->submitBtnText()
 			)
 		) {
 			EE_Error::add_attention(
@@ -211,6 +196,7 @@ class VerifyChanges extends Step {
 			);
 			exit();
 		}
+		$this->setRedirectTo( SequentialStepForm::REDIRECT_TO_NEXT_STEP );
 		return true;
 	}
 

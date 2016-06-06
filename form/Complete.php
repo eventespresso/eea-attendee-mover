@@ -43,15 +43,6 @@ class Complete extends Step
 			FormHandler::ADD_FORM_TAGS_AND_SUBMIT,
 			$registry
 		);
-		$this->REG_ID = $this->getRegId();
-		$this->EVT_ID = $this->getEventId();
-		$this->TKT_ID = $this->getTicketId();
-		$this->addFormActionArgs(
-			array(
-				'EVT_ID' => $this->EVT_ID,
-				'TKT_ID' => $this->TKT_ID,
-			)
-		);
 	}
 
 
@@ -68,7 +59,7 @@ class Complete extends Step
 		$this->setForm(
 			new \EE_Form_Section_Proper(
 				array(
-					'name'        => $this->formName(),
+					'name'        => $this->slug(),
 					'subsections' => array()
 				)
 			)
@@ -123,7 +114,7 @@ class Complete extends Step
 			)
 			->execute();
 		if ( ! $new_registration instanceof \EE_Registration ) {
-			throw new InvalidEntityException( $new_registration, 'EE_Registration' );
+			throw new InvalidEntityException( get_class( $new_registration ), 'EE_Registration' );
 		}
 		// setup redirect to new registration details admin page
 		$this->setRedirectUrl( REG_ADMIN_URL );
