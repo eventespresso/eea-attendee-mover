@@ -6,6 +6,7 @@ use EE_Event;
 use EE_Form_Section_Proper;
 use EE_Ticket;
 use EventEspresso\core\libraries\form_sections\form_handlers\FormHandler;
+use EventEspresso\core\libraries\form_sections\form_handlers\SequentialStepForm;
 use InvalidArgumentException;
 use EventEspresso\core\exceptions\InvalidDataTypeException;
 
@@ -43,9 +44,6 @@ class SelectTicket extends Step {
 			FormHandler::ADD_FORM_TAGS_AND_SUBMIT,
 			$registry
 		);
-		$this->EVT_ID = $this->getEventId();
-		$this->addFormActionArgs( array( 'EVT_ID' => $this->EVT_ID) );
-		$this->addRedirectArgs( array( 'EVT_ID' => $this->EVT_ID ) );
 	}
 
 
@@ -81,7 +79,7 @@ class SelectTicket extends Step {
 		$this->setForm(
 			new \EE_Form_Section_Proper(
 				array(
-					'name'        => $this->formName(),
+					'name'        => $this->slug(),
 					'subsections' => array(
 						'TKT_ID' => new \EE_Select_Input(
 							$tickets_by_datetime,
@@ -92,7 +90,7 @@ class SelectTicket extends Step {
 								'html_label_text'    => __( 'Select New Ticket', 'event_espresso' ),
 								'required'           => true,
 							)
-						)
+						),
 					)
 				)
 			)
@@ -124,6 +122,7 @@ class SelectTicket extends Step {
 		// process form and set $TKT_ID
 		if ( $TKT_ID ) {
 			$this->addRedirectArgs( array( 'TKT_ID' => $TKT_ID ) );
+			$this->setRedirectTo( SequentialStepForm::REDIRECT_TO_NEXT_STEP );
 			return true;
 		}
 		return false;
