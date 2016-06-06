@@ -1,4 +1,5 @@
 <?php
+use EventEspresso\core\exceptions\ExceptionStackTraceDisplay;
 use EventEspresso\core\libraries\form_sections\form_handlers\FormHandler;
 
 if ( ! defined( 'EVENT_ESPRESSO_VERSION')) { exit('No direct script access allowed'); }
@@ -59,6 +60,11 @@ class EED_Attendee_Mover extends EED_Module {
 		 add_action(
 			 'AHEE__reg_admin_details_main_meta_box_reg_details__top',
 		      array( 'EED_Attendee_Mover', 'edit_attendee_selections_button' ),
+			 10, 1
+		 );
+		 add_action(
+			 'AHEE__reg_status_change_buttons__after_header',
+		      array( 'EED_Attendee_Mover', 'registration_moved_notice' ),
 			 10, 1
 		 );
 		 add_filter(
@@ -204,7 +210,18 @@ class EED_Attendee_Mover extends EED_Module {
 			),
 			'metaboxes'     => array_merge(
 				$admin_page->default_espresso_metaboxes(),
-				array( array( 'EED_Attendee_Mover', 'add_edit_attendee_selections_meta_box' ) )
+				array(
+					function () {
+						add_meta_box(
+							'edit-attendee-selection-mbox',
+							__( 'Change Event/Ticket Selection', 'event_espresso' ),
+							array( 'EED_Attendee_Mover', 'edit_attendee_selections_meta_box' ),
+							EED_Attendee_Mover::$admin_page->wp_page_slug(),
+							'normal',
+							'high'
+						);
+					}
+				)
 			),
 			'require_nonce' => true
 		);
@@ -307,15 +324,47 @@ class EED_Attendee_Mover extends EED_Module {
 
 
 
-	public static function add_edit_attendee_selections_meta_box() {
-		add_meta_box(
-			'edit-attendee-selection-mbox',
-			__( 'Change Event/Ticket Selection', 'event_espresso' ),
-			array( 'EED_Attendee_Mover', 'edit_attendee_selections_meta_box' ),
-			EED_Attendee_Mover::$admin_page->wp_page_slug(),
-			'normal',
-			'high'
+	/**
+	 * @param $REG_ID
+	 */
+	public static function registration_moved_notice( $REG_ID ) {
+		/** @var EE_Registration $registration */
+		$registration = EEM_Registration::instance()->get_one_by_ID( $REG_ID );
+		$reg_moved_meta = array(
+			'registration-moved-to' => array(
+				'meta_key' => 'NEW_REG_ID',
+				'message' => __(
+					'%1$sThis registration was cancelled and moved to a %2$snew registration%3$s.%4$s',
+					'event_espresso'
+				)
+			),
+			'registration-moved-from' => array(
+				'meta_key' => 'OLD_REG_ID',
+				'message' => __(
+					'%1$sThis registration was moved from a %2$sprevious registration%3$s which has been cancelled.%4$s',
+					'event_espresso'
+				)
+			),
 		);
+		foreach ( $reg_moved_meta as $to_or_from => $reg_meta ) {
+			$reg_moved = $registration->get_extra_meta( $to_or_from, true, array() );
+			if ( isset( $reg_meta['meta_key'], $reg_moved[ $reg_meta['meta_key'] ], $reg_meta['message'] ) ) {
+				$reg_details_url = add_query_arg(
+					array(
+						'action'  => 'view_registration',
+						'_REG_ID' => $reg_moved[ $reg_meta['meta_key'] ],
+					),
+					REG_ADMIN_URL
+				);
+				echo sprintf(
+					$reg_meta['message'],
+					'<p class="important-notice">',
+					'<a href="' . $reg_details_url . '">',
+					'</a>',
+					'</p>'
+				);
+			}
+		}
 	}
 
 
@@ -371,8 +420,12 @@ class EED_Attendee_Mover extends EED_Module {
 	 * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
 	 */
 	protected function _edit_attendee_selections_init() {
-		$form_steps_manager = $this->get_form_steps_manager();
-		$form_steps_manager->buildForm();
+		try {
+			$form_steps_manager = $this->get_form_steps_manager();
+			$form_steps_manager->buildForm();
+		} catch ( Exception $e ) {
+			new ExceptionStackTraceDisplay( $e );
+		}
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ), 1 );
 	}
 
@@ -408,10 +461,14 @@ class EED_Attendee_Mover extends EED_Module {
 	 * @throws \InvalidArgumentException
 	 */
 	public function _edit_attendee_selections_meta_box() {
-		$form_steps_manager = $this->get_form_steps_manager();
-		echo $form_steps_manager->displayProgressSteps();
-		echo \EEH_HTML::h1( $form_steps_manager->getCurrentStep()->formName() );
-		echo $form_steps_manager->displayCurrentStepForm();
+		try {
+			$form_steps_manager = $this->get_form_steps_manager();
+			echo $form_steps_manager->displayProgressSteps();
+			echo \EEH_HTML::h1( $form_steps_manager->getCurrentStep()->formName() );
+			echo $form_steps_manager->displayCurrentStepForm();
+		} catch ( Exception $e ) {
+			new ExceptionStackTraceDisplay( $e );
+		}
 	}
 
 
@@ -449,8 +506,12 @@ class EED_Attendee_Mover extends EED_Module {
 	 * @throws \InvalidArgumentException
 	 */
 	protected function _process_attendee_selections( \Registrations_Admin_Page $admin_page ) {
-		$form_steps_manager = $this->get_form_steps_manager( false );
-		$form_steps_manager->processForm( $admin_page->get_request_data() );
+		try {
+			$form_steps_manager = $this->get_form_steps_manager( false );
+			$form_steps_manager->processForm( $admin_page->get_request_data() );
+		} catch ( Exception $e ) {
+			new ExceptionStackTraceDisplay( $e );
+		}
 	}
 
 
