@@ -1,8 +1,8 @@
 <?php
 namespace EventEspresso\AttendeeMover\services\commands;
 
-use EventEspresso\core\services\commands\AbstractCommand;
 use EventEspresso\core\services\commands\CommandBusInterface;
+use EventEspresso\core\services\commands\SelfExecutingCommand;
 
 if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
 	exit( 'No direct script access allowed' );
@@ -20,7 +20,7 @@ if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
  * @author        Brent Christensen
  * @since         4.9.0
  */
-class MoveAttendeeCommand extends AbstractCommand
+class MoveAttendeeCommand extends SelfExecutingCommand
 {
 
 	/**
@@ -33,6 +33,11 @@ class MoveAttendeeCommand extends AbstractCommand
 	 */
 	private $ticket;
 
+	/**
+	 * @var \EE_Registration $new_registration
+	 */
+	protected $new_registration;
+
 
 
 	/**
@@ -40,16 +45,18 @@ class MoveAttendeeCommand extends AbstractCommand
 	 *
 	 * @param \EE_Registration    $old_registration
 	 * @param \EE_Ticket          $new_ticket
+	 * @param \EE_Registry        $registry
 	 * @param CommandBusInterface $command_bus
 	 */
 	public function __construct(
 		\EE_Registration $old_registration,
 		\EE_Ticket $new_ticket,
+		\EE_Registry $registry,
 		CommandBusInterface $command_bus
 	) {
 		$this->registration = $old_registration;
 		$this->ticket = $new_ticket;
-		parent::__construct( $command_bus );
+		parent::__construct( $registry, $command_bus, 'new_registration' );
 	}
 
 
@@ -70,6 +77,16 @@ class MoveAttendeeCommand extends AbstractCommand
 	public function ticket()
 	{
 		return $this->ticket;
+	}
+
+
+
+	/**
+	 * @return \EE_Registration
+	 */
+	public function newRegistration()
+	{
+		return $this->new_registration;
 	}
 
 
