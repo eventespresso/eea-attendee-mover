@@ -81,7 +81,7 @@ class SelectEvent extends Step {
 								'required'           => true,
 							)
 						),
-						'phoney' => new \EE_Phone_Input(),
+						// 'phoney' => new \EE_Phone_Input(),
 					)
 				)
 			)
@@ -104,7 +104,7 @@ class SelectEvent extends Step {
 	 * @throws InvalidDataTypeException
 	 */
 	public function process( $form_data = array() ) {
-		$form_data[ $this->slug() ]['phoney'] = '123456';
+		// $form_data[ $this->slug() ]['phoney'] = '123456';
 		// process form
 		$valid_data = (array) parent::process( $form_data );
 		if ( empty( $valid_data ) ) {
