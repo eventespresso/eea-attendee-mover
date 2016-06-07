@@ -112,7 +112,7 @@ class Complete extends Step
 				'EventEspresso\AttendeeMover\services\commands\MoveAttendeeCommand',
 				array( $old_registration, $new_ticket )
 			)
-			->execute();
+			->newRegistration();
 		if ( ! $new_registration instanceof \EE_Registration ) {
 			throw new InvalidEntityException( get_class( $new_registration ), 'EE_Registration' );
 		}
