@@ -88,24 +88,25 @@ class EED_Attendee_Mover extends EED_Module {
 		EE_Psr4AutoloaderInit::psr4_loader()->addNamespace( 'EventEspresso\AttendeeMover', __DIR__ );
 		$attendee_mover_dependencies = array(
 			'EventEspresso\AttendeeMover\form\SelectEvent' => array(
-				'EE_Registry' => EE_Dependency_Map::load_from_cache
+				'EE_Registry' => EE_Dependency_Map::load_from_cache,
 			),
 			'EventEspresso\AttendeeMover\form\SelectTicket' => array(
-				'EE_Registry' => EE_Dependency_Map::load_from_cache
+				'EE_Registry' => EE_Dependency_Map::load_from_cache,
 			),
 			'EventEspresso\AttendeeMover\form\VerifyChanges' => array(
-				'EE_Registry' => EE_Dependency_Map::load_from_cache
+				'EE_Registry' => EE_Dependency_Map::load_from_cache,
 			),
 			'EventEspresso\AttendeeMover\form\Complete' => array(
-				'EE_Registry' => EE_Dependency_Map::load_from_cache
+				'EE_Registry' => EE_Dependency_Map::load_from_cache,
 			),
 			'EventEspresso\AttendeeMover\services\commands\MoveAttendeeCommand' => array(
 				null,
 				null,
-				'CommandBusInterface' => EE_Dependency_Map::load_from_cache
+				'EE_Registry' => EE_Dependency_Map::load_from_cache,
+				'CommandBusInterface' => EE_Dependency_Map::load_from_cache,
 			),
 			'EventEspresso\AttendeeMover\services\commands\MoveAttendeeCommandHandler' => array(
-				'RegistrationsCapChecker' => EE_Dependency_Map::load_from_cache
+				'RegistrationsCapChecker' => EE_Dependency_Map::load_from_cache,
 			)
 		);
 		foreach ( $attendee_mover_dependencies as $class => $dependencies ) {

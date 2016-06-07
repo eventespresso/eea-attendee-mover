@@ -7,9 +7,6 @@ use EventEspresso\core\exceptions\InsufficientPermissionsException;
 use EventEspresso\core\services\capabilities\RegistrationsCapChecker;
 use EventEspresso\core\services\commands\CommandHandlerInterface;
 use EventEspresso\core\services\commands\CommandInterface;
-use EventEspresso\core\services\registration\Cancel;
-use EventEspresso\core\services\registration\Copy;
-use EventEspresso\core\services\registration\Create;
 
 if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
 	exit( 'No direct script access allowed' );
@@ -69,27 +66,43 @@ class MoveAttendeeCommandHandler implements CommandHandlerInterface
 		$new_ticket = $command->ticket();
 		// have we already processed this registration change ? if so, then bail...
 		$this->checkIfRegistrationChangeAlreadyProcessed( $old_registration, $new_ticket );
-		$old_ticket = $old_registration->ticket();
 		// get transaction for original registration
 		$transaction = $this->getTransaction( $old_registration );
-		// create new registration and it's associated line items
-		$new_registration = Create::registrationAndLineItemForTransaction(
-			$transaction,
-			$old_ticket,
-			$old_registration->count()
+		// create new line item for new ticket
+		$ticket_line_item = $command->executeSubCommand(
+			'CreateTicketLineItemCommand',
+			array( $transaction, $new_ticket, 1 )
+		)
+		->ticketLineItem();
+		// then generate a new registration from that
+		$new_registration = $command->executeSubCommand(
+			'CreateRegistrationCommand',
+			array(
+				$transaction,
+				$new_ticket,
+				$ticket_line_item,
+				$old_registration->count(),
+				$old_registration->group_size(),
+			)
+		)
+		->registration();
+		// move/copy over additional data from old registration, like reg form question answers
+		$command->executeSubCommand(
+			'CopyRegistrationDetailsCommand',
+			array( $new_registration, $old_registration )
 		);
-		// move/copy over additional data from old registration, like reg form question answers, and reg payments
-		Copy::registrationDetails( $new_registration, $old_registration );
-		Copy::registrationPayments( $new_registration, $old_registration );
+		// and registration payments
+		$command->executeSubCommand(
+			'CopyRegistrationPaymentsCommand',
+			array( $new_registration, $old_registration )
+		);
 		// then cancel original line item for ticket
-		Cancel::registrationTicketAndLineItem( $old_registration );
-		// reset transaction status back to incomplete
-		$transaction->set_status( \EEM_Transaction::incomplete_status_code );
-		// update transaction and all line item totals and subtotals
-		$transaction->total_line_item()->recalculate_total_including_taxes();
-		/** @type \EE_Registration_Processor $registration_processor */
-		$registration_processor = \EE_Registry::instance()->load_class( 'Registration_Processor' );
-		$registration_processor->update_registration_status_and_trigger_notifications( $new_registration );
+		$command->executeSubCommand( 'CancelRegistrationAndTicketLineItemCommand', array( $old_registration ) );
+		// perform final status updates and trigger notifications
+		$command->executeSubCommand(
+			'UpdateRegistrationAndTransactionAfterChangeCommand',
+			array( $new_registration )
+		);
 		// tag registrations for identification purposes
 		$this->addExtraMeta( $old_registration, $new_registration, $new_ticket );
 		return $new_registration;
