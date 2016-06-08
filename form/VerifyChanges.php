@@ -175,6 +175,7 @@ class VerifyChanges extends Step {
 		if ( empty( $valid_data ) ) {
 			return false;
 		}
+		// check that it was the submit button that was clicked and not the cancel button
 		if (
 			! (
 				isset( $valid_data['verify_changes-submit-btn'] )
