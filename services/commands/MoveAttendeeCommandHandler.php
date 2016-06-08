@@ -79,7 +79,6 @@ class MoveAttendeeCommandHandler implements CommandHandlerInterface
 			'CreateRegistrationCommand',
 			array(
 				$transaction,
-				$new_ticket,
 				$ticket_line_item,
 				$old_registration->count(),
 				$old_registration->group_size(),
