@@ -106,13 +106,13 @@ class Complete extends Step
 		$this->setRedirectTo( SequentialStepForm::REDIRECT_TO_PREV_STEP );
 		$old_registration = $this->getRegistration( $this->REG_ID );
 		$new_ticket = $this->getTicket( $this->TKT_ID );
-
-		$new_registration = $this->registry
+		/** @var \EventEspresso\AttendeeMover\services\commands\MoveAttendeeCommand $MoveAttendeeCommand */
+		$MoveAttendeeCommand = $this->registry
 			->create(
 				'EventEspresso\AttendeeMover\services\commands\MoveAttendeeCommand',
 				array( $old_registration, $new_ticket )
-			)
-			->newRegistration();
+			);
+		$new_registration = $MoveAttendeeCommand->commandBus()->execute( $MoveAttendeeCommand );
 		if ( ! $new_registration instanceof \EE_Registration ) {
 			throw new InvalidEntityException( get_class( $new_registration ), 'EE_Registration' );
 		}
