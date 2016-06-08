@@ -70,7 +70,8 @@ class SelectTicket extends Step {
 							if ( ! isset( $tickets_by_datetime[ $datetime->name() ] ) ) {
 								$tickets_by_datetime[ $datetime->name() ] = array();
 							}
-							$tickets_by_datetime[ $datetime->name() ][ $ticket->ID() ] = $ticket->name();
+							$tickets_by_datetime[ $datetime->name() ][ $ticket->ID() ]
+								= $ticket->name() . ' : ' . $ticket->pretty_price();
 						}
 					}
 				}
