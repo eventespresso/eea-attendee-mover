@@ -2,7 +2,6 @@
 namespace EventEspresso\AttendeeMover\services\commands;
 
 use EventEspresso\core\services\commands\Command;
-use EventEspresso\core\services\commands\CommandBusInterface;
 
 if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
 	exit( 'No direct script access allowed' );
@@ -40,18 +39,13 @@ class MoveAttendeeCommand extends Command
 	 *
 	 * @param \EE_Registration    $old_registration
 	 * @param \EE_Ticket          $new_ticket
-	 * @param \EE_Registry        $registry
-	 * @param CommandBusInterface $command_bus
 	 */
 	public function __construct(
 		\EE_Registration $old_registration,
-		\EE_Ticket $new_ticket,
-		\EE_Registry $registry,
-		CommandBusInterface $command_bus
+		\EE_Ticket $new_ticket
 	) {
 		$this->registration = $old_registration;
 		$this->ticket = $new_ticket;
-		parent::__construct( $registry, $command_bus );
 	}
 
 
