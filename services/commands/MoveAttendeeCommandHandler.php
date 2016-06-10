@@ -5,7 +5,8 @@ use EventEspresso\core\exceptions\EntityNotFoundException;
 use EventEspresso\core\exceptions\InvalidEntityException;
 use EventEspresso\core\exceptions\InsufficientPermissionsException;
 use EventEspresso\core\services\capabilities\RegistrationsCapChecker;
-use EventEspresso\core\services\commands\CommandHandlerInterface;
+use EventEspresso\core\services\commands\CommandBusInterface;
+use EventEspresso\core\services\commands\CommandHandler;
 use EventEspresso\core\services\commands\CommandInterface;
 
 if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
@@ -24,7 +25,7 @@ if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
  * @author        Brent Christensen
  * @since         1.0.0
  */
-class MoveAttendeeCommandHandler implements CommandHandlerInterface
+class MoveAttendeeCommandHandler extends CommandHandler
 {
 
 	/**
@@ -38,10 +39,17 @@ class MoveAttendeeCommandHandler implements CommandHandlerInterface
 	 * MoveAttendeeCommandHandler constructor.
 	 *
 	 * @param RegistrationsCapChecker $cap_checker
+	 * @param \EE_Registry            $registry
+	 * @param CommandBusInterface     $command_bus
 	 */
-	public function __construct( RegistrationsCapChecker $cap_checker )
+	public function __construct(
+		RegistrationsCapChecker $cap_checker,
+		\EE_Registry $registry,
+		CommandBusInterface $command_bus
+	)
 	{
 		$this->cap_checker = $cap_checker;
+		parent::__construct( $registry, $command_bus );
 	}
 
 
@@ -69,37 +77,38 @@ class MoveAttendeeCommandHandler implements CommandHandlerInterface
 		// get transaction for original registration
 		$transaction = $this->getTransaction( $old_registration );
 		// create new line item for new ticket
-		$ticket_line_item = $command->executeSubCommand(
-			'CreateTicketLineItemCommand',
+		$ticket_line_item = $this->executeSubCommand(
+			'EventEspresso\core\services\ticket\CreateTicketLineItemCommand',
 			array( $transaction, $new_ticket, 1 )
-		)
-		->ticketLineItem();
+		);
 		// then generate a new registration from that
-		$new_registration = $command->executeSubCommand(
-			'CreateRegistrationCommand',
+		$new_registration = $this->executeSubCommand(
+			'EventEspresso\core\services\registration\CreateRegistrationCommand',
 			array(
 				$transaction,
 				$ticket_line_item,
 				$old_registration->count(),
 				$old_registration->group_size(),
 			)
-		)
-		->registration();
+		);
 		// move/copy over additional data from old registration, like reg form question answers
-		$command->executeSubCommand(
-			'CopyRegistrationDetailsCommand',
+		$this->executeSubCommand(
+			'EventEspresso\core\services\registration\CopyRegistrationDetailsCommand',
 			array( $new_registration, $old_registration )
 		);
 		// and registration payments
-		$command->executeSubCommand(
-			'CopyRegistrationPaymentsCommand',
+		$this->executeSubCommand(
+			'EventEspresso\core\services\registration\CopyRegistrationPaymentsCommand',
 			array( $new_registration, $old_registration )
 		);
 		// then cancel original line item for ticket
-		$command->executeSubCommand( 'CancelRegistrationAndTicketLineItemCommand', array( $old_registration ) );
+		$this->executeSubCommand(
+			'EventEspresso\core\services\registration\CancelRegistrationAndTicketLineItemCommand',
+			array( $old_registration )
+		);
 		// perform final status updates and trigger notifications
-		$command->executeSubCommand(
-			'UpdateRegistrationAndTransactionAfterChangeCommand',
+		$this->executeSubCommand(
+			'EventEspresso\core\services\registration\UpdateRegistrationAndTransactionAfterChangeCommand',
 			array( $new_registration )
 		);
 		// tag registrations for identification purposes
