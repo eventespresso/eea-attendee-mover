@@ -99,14 +99,10 @@ class EED_Attendee_Mover extends EED_Module {
 			'EventEspresso\AttendeeMover\form\Complete' => array(
 				'EE_Registry' => EE_Dependency_Map::load_from_cache,
 			),
-			'EventEspresso\AttendeeMover\services\commands\MoveAttendeeCommand' => array(
-				null,
-				null,
-				'EE_Registry' => EE_Dependency_Map::load_from_cache,
-				'CommandBusInterface' => EE_Dependency_Map::load_from_cache,
-			),
 			'EventEspresso\AttendeeMover\services\commands\MoveAttendeeCommandHandler' => array(
 				'RegistrationsCapChecker' => EE_Dependency_Map::load_from_cache,
+				'EE_Registry'         => EE_Dependency_Map::load_from_cache,
+				'CommandBusInterface' => EE_Dependency_Map::load_from_cache,
 			)
 		);
 		foreach ( $attendee_mover_dependencies as $class => $dependencies ) {
