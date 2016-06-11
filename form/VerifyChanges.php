@@ -146,7 +146,8 @@ class VerifyChanges extends Step {
 								'subsections'     => array(
 									'trigger_notifications' => new \EE_Yes_No_Input(
 										array(
-											'html_help_text' => __(
+											'html_label_text' => __( 'Trigger Notifications?', 'event_espresso' ),
+											'html_help_text'  => __(
 												'If "Yes" is selected, then notifications regarding these changes will be sent to the registration\'s contact.',
 												'event_espresso'
 											),
