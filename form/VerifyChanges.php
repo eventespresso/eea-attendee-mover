@@ -75,8 +75,9 @@ class VerifyChanges extends Step {
 		$this->setForm(
 			new \EE_Form_Section_Proper(
 				array(
-					'name'        => $this->slug(),
-					'subsections' => array(
+					'name'            => $this->slug(),
+					'layout_strategy' => new \EE_Div_Per_Section_Layout(),
+					'subsections'     => array(
 						'changes' => new EE_Form_Section_HTML(
 							\EEH_HTML::table(
 								\EEH_HTML::thead(
@@ -139,8 +140,25 @@ class VerifyChanges extends Step {
 								'eea-attendee-mover-info-table ee-responsive-table'
 							)
 						),
+						new \EE_Form_Section_Proper(
+							array(
+								'layout_strategy' => new \EE_Admin_Two_Column_Layout(),
+								'subsections'     => array(
+									'trigger_notifications' => new \EE_Yes_No_Input(
+										array(
+											'html_help_text' => __(
+												'If "Yes" is selected, then notifications regarding these changes will be sent to the registration\'s contact.',
+												'event_espresso'
+											),
+										)
+									),
+									'1' => new EE_Form_Section_HTML( \EEH_HTML::br() ),
+								),
+							)
+						),
 						$this->slug() . '-submit-btn' => $this->generateSubmitButton(),
 						$this->slug() . '-cancel-btn' => $this->generateCancelButton(),
+						'2' => new EE_Form_Section_HTML( \EEH_HTML::br(2) ),
 						'EVT_ID' => new \EE_Fixed_Hidden_Input(
 							array( 'default'  => $this->getEventId() )
 						),
@@ -196,6 +214,15 @@ class VerifyChanges extends Step {
 				)
 			);
 			exit();
+		}
+		if (
+			isset( $valid_data['trigger_notifications'] )
+			&& $valid_data['trigger_notifications'] === true
+		) {
+			// send out notifications
+			add_filter( 'FHEE__EED_Messages___maybe_registration__deliver_notifications', '__return_true', 10 );
+		} else {
+			add_filter( 'FHEE__EED_Messages___maybe_registration__deliver_notifications', '__return_false', 15 );
 		}
 		$this->setRedirectTo( SequentialStepForm::REDIRECT_TO_NEXT_STEP );
 		return true;
