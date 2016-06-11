@@ -122,6 +122,18 @@ class SelectTicket extends Step {
 		$TKT_ID = isset( $valid_data['TKT_ID' ] ) ? absint( $valid_data['TKT_ID' ] ) : 0;
 		// process form and set $TKT_ID
 		if ( $TKT_ID ) {
+			$registration = $this->getRegistration( $this->REG_ID );
+			if ( $registration instanceof \EE_Registration ) {
+				$existing_ticket_ID = $registration->ticket_ID();
+				if ( $TKT_ID === $existing_ticket_ID ) {
+					throw new \RuntimeException(
+						__(
+							'Registrations can not be moved if you select the exact same ticket that the registration already has! Please select a different ticket.',
+							'event_espresso'
+						)
+					);
+				}
+			}
 			$this->addRedirectArgs( array( 'TKT_ID' => $TKT_ID ) );
 			$this->setRedirectTo( SequentialStepForm::REDIRECT_TO_NEXT_STEP );
 			return true;
