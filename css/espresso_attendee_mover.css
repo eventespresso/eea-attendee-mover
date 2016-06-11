@@ -10,10 +10,12 @@ General Styles
 	width:50% !important;
 }
 
-#edit-attendee-selection-mbox .ee-cancel-form,
-#edit-attendee-selection-mbox .ee-form-submit {
-	float: right;
-	margin-left:1em;
+#verify-changes .ee-cancel-form {
+	margin-left: 20px;
+}
+#verify-changes .ee-form-submit {
+	float:left;
+	margin-left: 250px;
 }
 
 #edit-attendee-selection-mbox .ee-txn-refund {
@@ -24,6 +26,9 @@ General Styles
 	text-align: right;
 }
 
+.espresso-admin .eea-attendee-mover-info-table th {
+	width: auto !important;
+}
 
 /* Media Query for screens smaller then 768px (iPad portrait)
 ---------------------------------------------------------------------------------------------------- */
