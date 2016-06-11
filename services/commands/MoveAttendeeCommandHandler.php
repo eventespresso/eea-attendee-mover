@@ -78,12 +78,12 @@ class MoveAttendeeCommandHandler extends CommandHandler
 		$transaction = $this->getTransaction( $old_registration );
 		// create new line item for new ticket
 		$ticket_line_item = $this->executeSubCommand(
-			'EventEspresso\core\services\ticket\CreateTicketLineItemCommand',
+			'EventEspresso\core\services\commands\ticket\CreateTicketLineItemCommand',
 			array( $transaction, $new_ticket, 1 )
 		);
 		// then generate a new registration from that
 		$new_registration = $this->executeSubCommand(
-			'EventEspresso\core\services\registration\CreateRegistrationCommand',
+			'EventEspresso\core\services\commands\registration\CreateRegistrationCommand',
 			array(
 				$transaction,
 				$ticket_line_item,
@@ -93,22 +93,22 @@ class MoveAttendeeCommandHandler extends CommandHandler
 		);
 		// move/copy over additional data from old registration, like reg form question answers
 		$this->executeSubCommand(
-			'EventEspresso\core\services\registration\CopyRegistrationDetailsCommand',
+			'EventEspresso\core\services\commands\registration\CopyRegistrationDetailsCommand',
 			array( $new_registration, $old_registration )
 		);
 		// and registration payments
 		$this->executeSubCommand(
-			'EventEspresso\core\services\registration\CopyRegistrationPaymentsCommand',
+			'EventEspresso\core\services\commands\registration\CopyRegistrationPaymentsCommand',
 			array( $new_registration, $old_registration )
 		);
 		// then cancel original line item for ticket
 		$this->executeSubCommand(
-			'EventEspresso\core\services\registration\CancelRegistrationAndTicketLineItemCommand',
+			'EventEspresso\core\services\commands\registration\CancelRegistrationAndTicketLineItemCommand',
 			array( $old_registration )
 		);
 		// perform final status updates and trigger notifications
 		$this->executeSubCommand(
-			'EventEspresso\core\services\registration\UpdateRegistrationAndTransactionAfterChangeCommand',
+			'EventEspresso\core\services\commands\registration\UpdateRegistrationAndTransactionAfterChangeCommand',
 			array( $new_registration )
 		);
 		// tag registrations for identification purposes
