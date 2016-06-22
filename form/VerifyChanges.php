@@ -5,7 +5,6 @@ use EE_Admin_Page;
 use EE_Error;
 use EE_Form_Section_HTML;
 use EE_Form_Section_Proper;
-use EED_Attendee_Mover;
 use EEH_HTML;
 use EventEspresso\core\libraries\form_sections\form_handlers\FormHandler;
 use EventEspresso\core\libraries\form_sections\form_handlers\SequentialStepForm;
