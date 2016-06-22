@@ -1,10 +1,12 @@
 <?php
 namespace EventEspresso\AttendeeMover\services\commands;
 
+use EventEspresso\core\domain\services\capabilities\CapCheck;
 use EventEspresso\core\services\commands\Command;
+use EventEspresso\core\services\commands\CommandRequiresCapCheckInterface;
 
-if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
-	exit( 'No direct script access allowed' );
+if ( ! defined('EVENT_ESPRESSO_VERSION')) {
+    exit('No direct script access allowed');
 }
 
 
@@ -17,56 +19,70 @@ if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
  *
  * @package       Event Espresso
  * @author        Brent Christensen
- * @since         4.9.0
+ * @since         1.0.0
  */
-class MoveAttendeeCommand extends Command
+class MoveAttendeeCommand extends Command implements CommandRequiresCapCheckInterface
 {
 
-	/**
-	 * @var \EE_Registration $registration
-	 */
-	private $registration;
+    /**
+     * @var \EE_Registration $registration
+     */
+    private $registration;
 
-	/**
-	 * @var \EE_Ticket $ticket
-	 */
-	private $ticket;
-
-
-
-	/**
-	 * MoveAttendeeCommand constructor.
-	 *
-	 * @param \EE_Registration    $old_registration
-	 * @param \EE_Ticket          $new_ticket
-	 */
-	public function __construct(
-		\EE_Registration $old_registration,
-		\EE_Ticket $new_ticket
-	) {
-		$this->registration = $old_registration;
-		$this->ticket = $new_ticket;
-	}
+    /**
+     * @var \EE_Ticket $ticket
+     */
+    private $ticket;
 
 
 
-	/**
-	 * @return \EE_Registration
-	 */
-	public function registration()
-	{
-		return $this->registration;
-	}
+    /**
+     * MoveAttendeeCommand constructor.
+     *
+     * @param \EE_Registration $old_registration
+     * @param \EE_Ticket       $new_ticket
+     */
+    public function __construct(
+        \EE_Registration $old_registration,
+        \EE_Ticket $new_ticket
+    ) {
+        $this->registration = $old_registration;
+        $this->ticket = $new_ticket;
+    }
 
 
 
-	/**
-	 * @return \EE_Ticket
-	 */
-	public function ticket()
-	{
-		return $this->ticket;
-	}
+    /**
+     * @return \EventEspresso\core\domain\services\capabilities\CapCheck
+     */
+    public function getCapCheck()
+    {
+        return new CapCheck(
+            'ee_edit_registration',
+            __('Edit Registration Ticket Selection', 'event_espresso'),
+            $this->registration->ID()
+        );
+    }
+
+
+
+    /**
+     * @return \EE_Registration
+     */
+    public function registration()
+    {
+        return $this->registration;
+    }
+
+
+
+    /**
+     * @return \EE_Ticket
+     */
+    public function ticket()
+    {
+        return $this->ticket;
+    }
 
 
 
