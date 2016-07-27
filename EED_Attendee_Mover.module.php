@@ -246,11 +246,13 @@ class EED_Attendee_Mover extends EED_Module {
 				)
 			)
 		) {
-			$actions['edit_attendee_selections'] = EED_Attendee_Mover::edit_attendee_selections_button(
-				$registration->ID(),
-				false,
-				false
-			);
+			$actions['edit_attendee_selections'] = '<li>'
+			  . EED_Attendee_Mover::edit_attendee_selections_button(
+					$registration->ID(),
+					false,
+					false
+				)
+			  . '</li>';
 		}
 		return $actions;
 	}
