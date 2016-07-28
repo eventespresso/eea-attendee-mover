@@ -77,6 +77,11 @@ class EED_Attendee_Mover extends EED_Module {
 			 array( 'EED_Attendee_Mover', 'attendee_mover_page_config' ),
 			 10, 2
 		 );
+		 add_filter(
+			 'FHEE__EE_Admin_Page___display_legend__items',
+			 array( 'EED_Attendee_Mover', 'reg_admin_list_legend' ),
+			 10, 1
+		 );
 	 }
 
 
@@ -246,13 +251,11 @@ class EED_Attendee_Mover extends EED_Module {
 				)
 			)
 		) {
-			$actions['edit_attendee_selections'] = '<li>'
-			  . EED_Attendee_Mover::edit_attendee_selections_button(
-					$registration->ID(),
-					false,
-					false
-				)
-			  . '</li>';
+			$actions['edit_attendee_selections'] = EED_Attendee_Mover::edit_attendee_selections_button(
+				$registration->ID(),
+				false,
+				false
+			);
 		}
 		return $actions;
 	}
@@ -289,7 +292,7 @@ class EED_Attendee_Mover extends EED_Module {
 			$url,
 			$link_text,
 			$link_class,
-			'dashicons dashicons-tickets-alt dashicons dashicons-update',
+			'dashicons dashicons-controls-repeat',
 			$link_label
 		);
 		if ( $echo ) {
@@ -297,6 +300,27 @@ class EED_Attendee_Mover extends EED_Module {
 			return '';
 		}
 		return $html;
+	}
+
+
+
+	/**
+	 * @return array
+	 */
+    public static function reg_admin_list_legend(array $items)
+    {
+        // insert attendee_mover icon before the "approved_status" icon
+        $items = EEH_Array::insert_into_array(
+            $items,
+            array(
+                'attendee_mover' => array(
+                    'class' => 'dashicons dashicons-controls-repeat',
+                    'desc'  => __('Change Event/Ticket Selection', 'event_espresso'),
+                ),
+            ),
+            "approved_status"
+        );
+        return $items;
 	}
 
 
