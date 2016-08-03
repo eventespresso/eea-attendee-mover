@@ -1,8 +1,8 @@
 <?php
 /*
-  Plugin Name: Event Espresso - Attendee Mover (EE4.9.0+)
+  Plugin Name: Event Espresso - Attendee Mover (EE4.9.5+)
   Plugin URI: http://www.eventespresso.com
-  Description: The Event Espresso Attendee Mover adds NEW stuff to Event Espresso.
+  Description: The Attendee Mover add-on for Event Espresso will let you move attendees between events.
   Version: 1.0.0.dev.000
   Author: Event Espresso
   Author URI: http://www.eventespresso.com
