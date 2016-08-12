@@ -41,6 +41,11 @@ abstract class Step extends SequentialStepForm {
 	 */
 	protected $TKT_ID = 0;
 
+	/**
+	 * @var \EE_Ticket $current_ticket
+	 */
+	protected $current_ticket;
+
 
 
 	/**
@@ -156,6 +161,95 @@ abstract class Step extends SequentialStepForm {
 			throw new EntityNotFoundException( 'Ticket ID', $TKT_ID );
 		}
 		return $ticket;
+	}
+
+
+
+	/**
+	 * @return \EE_Ticket
+	 */
+	protected function getCurrentTicket() {
+		if ( ! $this->current_ticket instanceof EE_Ticket ) {
+			$registration = $this->getRegistration( $this->REG_ID );
+			$this->current_ticket = $registration->ticket();
+		}
+		return $this->current_ticket;
+	}
+
+
+
+	/**
+	 * registrantInformation
+	 *
+	 * @return string
+	 */
+	public function registrantInformation() {
+		$registration = $this->getRegistration( $this->REG_ID );
+		$ticket = $this->getCurrentTicket();
+		$event = $registration->event();
+		return \EEH_HTML::div(
+			\EEH_HTML::h4( esc_html__( 'Current Registration Information', 'event_espresso' ) )
+			.
+			\EEH_HTML::span(
+				esc_html__( 'Attendee Name: ', 'event_espresso' ),
+				'',
+				'',
+				'display:inline-block; width:120px; white-space: nowrap;'
+			)
+			.
+			\EEH_HTML::span( $registration->attendee()->full_name(), '', '', 'margin-left: 1em; white-space: nowrap;' )
+			.
+			\EEH_HTML::span(
+				sprintf( esc_html__( ' ( ID: %1$d ) ', 'event_espresso' ), $registration->ID() ),
+				'',
+				'',
+				'color:#999999; font-size:.8em; margin-left: 1em; white-space: nowrap;'
+			)
+			.
+			\EEH_HTML::br()
+			.
+			\EEH_HTML::span(
+				esc_html__( 'Current Event: ', 'event_espresso' ),
+				'',
+				'',
+				'display:inline-block; width:120px; white-space: nowrap;'
+			)
+			.
+			\EEH_HTML::span( $event->name(), '', '', 'margin-left: 1em; white-space: nowrap;' )
+			.
+			\EEH_HTML::span(
+				sprintf( esc_html__( ' ( ID: %1$d ) ', 'event_espresso' ), $event->ID() ),
+				'',
+				'',
+				'color:#999999; font-size:.8em; margin-left: 1em; white-space: nowrap;'
+			)
+			.
+			\EEH_HTML::br()
+			.
+			\EEH_HTML::span(
+				esc_html__( 'Current Ticket: ', 'event_espresso' ),
+				'',
+				'',
+				'display:inline-block; width:120px; white-space: nowrap;'
+			)
+			.
+			\EEH_HTML::span(
+				$ticket->name() . ' : ' . $ticket->pretty_price(),
+				'',
+				'',
+				'margin-left: 1em; white-space: nowrap;'
+			)
+			.
+			\EEH_HTML::span(
+				sprintf( esc_html__( ' ( ID: %1$d ) ', 'event_espresso' ), $ticket->ID() ),
+				'',
+				'',
+				'color:#999999; font-size:.8em; margin-left: 1em; white-space: nowrap;'
+			),
+			'',
+			'',
+			'background:#fafafa; font-size:.85em; margin:1em 0 3em; padding:.25em 2em 2em;'
+		);
 	}
 
 
