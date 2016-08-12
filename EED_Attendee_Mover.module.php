@@ -116,7 +116,7 @@ class EED_Attendee_Mover extends EED_Module {
 			if ( ! EE_Dependency_Map::register_dependencies( $class, $dependencies ) ) {
 				EE_Error::add_error(
 					sprintf(
-						__( 'Could not register dependencies for "%1$s"', 'event_espresso' ),
+						esc_html__( 'Could not register dependencies for "%1$s"', 'event_espresso' ),
 						$class
 					),
 					__FILE__,
@@ -199,7 +199,7 @@ class EED_Attendee_Mover extends EED_Module {
 		$req_data = $admin_page->get_request_data();
 		$page_config['edit_attendee_selections'] = array(
 			'nav'           => array(
-				'label'      => __( 'Change Event/Ticket Selection', 'event_espresso' ),
+				'label'      => esc_html__( 'Change Event/Ticket Selection', 'event_espresso' ),
 				'order'      => 15,
 				'persistent' => false,
 				'url'        => isset( $req_data['_REG_ID'] )
@@ -218,7 +218,7 @@ class EED_Attendee_Mover extends EED_Module {
 					function () {
 						add_meta_box(
 							'edit-attendee-selection-mbox',
-							__( 'Change Event/Ticket Selection', 'event_espresso' ),
+							esc_html__( 'Change Event/Ticket Selection', 'event_espresso' ),
 							array( 'EED_Attendee_Mover', 'edit_attendee_selections_meta_box' ),
 							EED_Attendee_Mover::$admin_page->wp_page_slug(),
 							'normal',
@@ -283,11 +283,11 @@ class EED_Attendee_Mover extends EED_Module {
 		}
 		$url = EED_Attendee_Mover::get_edit_attendee_selections_url( $REG_ID );
 		if ( $button ) {
-			$link_text = $link_label = __( ' Change Event/Ticket Selection' );
+			$link_text = $link_label = esc_html__( ' Change Event/Ticket Selection' );
 			$link_class = 'button secondary-button right';
 		} else {
 			$link_text = '';
-			$link_label = __( ' Change Event/Ticket Selection' );
+			$link_label = esc_html__( ' Change Event/Ticket Selection' );
 			$link_class = 'right';
 		}
 		$html = EEH_Template::get_button_or_link(
@@ -317,7 +317,7 @@ class EED_Attendee_Mover extends EED_Module {
             array(
                 'attendee_mover' => array(
                     'class' => 'dashicons dashicons-controls-repeat',
-                    'desc'  => __('Change Event/Ticket Selection', 'event_espresso'),
+                    'desc'  => esc_html__('Change Event/Ticket Selection', 'event_espresso'),
                 ),
             ),
             "approved_status"
@@ -337,7 +337,7 @@ class EED_Attendee_Mover extends EED_Module {
 		$REG_ID = absint( $REG_ID );
 		if ( ! $REG_ID > 0 ) {
 			throw new InvalidArgumentException(
-				__( 'The Registration ID must be a positive integer.', 'event_espresso' )
+				esc_html__( 'The Registration ID must be a positive integer.', 'event_espresso' )
 			);
 		}
 		return EE_Admin_Page::add_query_args_and_nonce(
@@ -360,14 +360,14 @@ class EED_Attendee_Mover extends EED_Module {
 		$reg_moved_meta = array(
 			'registration-moved-to' => array(
 				'meta_key' => 'NEW_REG_ID',
-				'message' => __(
+				'message' => esc_html__(
 					'%1$sThis registration was cancelled and moved to a %2$snew registration%3$s.%4$s',
 					'event_espresso'
 				)
 			),
 			'registration-moved-from' => array(
 				'meta_key' => 'OLD_REG_ID',
-				'message' => __(
+				'message' => esc_html__(
 					'%1$sThis registration was moved from a %2$sprevious registration%3$s which has been cancelled.%4$s',
 					'event_espresso'
 				)
@@ -491,7 +491,7 @@ class EED_Attendee_Mover extends EED_Module {
 		try {
 			$form_steps_manager = $this->get_form_steps_manager();
 			echo $form_steps_manager->displayProgressSteps();
-			echo \EEH_HTML::h1( $form_steps_manager->getCurrentStep()->formName() );
+			// echo \EEH_HTML::h1( $form_steps_manager->getCurrentStep()->formName() );
 			echo $form_steps_manager->displayCurrentStepForm();
 		} catch ( Exception $e ) {
 			new ExceptionStackTraceDisplay( $e );
