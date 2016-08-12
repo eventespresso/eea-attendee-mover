@@ -5,10 +5,8 @@ use EE_Admin_Page;
 use EE_Error;
 use EE_Form_Section_HTML;
 use EE_Form_Section_Proper;
-use EEH_HTML;
 use EventEspresso\core\libraries\form_sections\form_handlers\FormHandler;
 use EventEspresso\core\libraries\form_sections\form_handlers\SequentialStepForm;
-use InvalidArgumentException;
 use EventEspresso\core\exceptions\InvalidDataTypeException;
 
 if ( ! defined( 'EVENT_ESPRESSO_VERSION' ) ) {
@@ -38,8 +36,8 @@ class VerifyChanges extends Step {
 	public function __construct( \EE_Registry $registry ) {
 		parent::__construct(
 			3,
-			__( 'Verify Changes', 'event_espresso' ),
-			__( '"Verify Changes" Attendee Mover Step', 'event_espresso' ),
+			esc_html__( 'Verify Changes', 'event_espresso' ),
+			esc_html__( '"Verify Changes" Attendee Mover Step', 'event_espresso' ),
 			'verify_changes',
 			'',
 			FormHandler::ADD_FORM_TAGS_AND_SUBMIT,
@@ -65,12 +63,12 @@ class VerifyChanges extends Step {
 		$new_ticket = $this->getTicket( $this->TKT_ID );
 		$price_change = $new_ticket->price() - $old_ticket->price();
 		$price_class = $price_change < 0 ? ' ee-txn-refund' : '';
-		$th1 = __( 'Attendee Name', 'event_espresso' );
-		$th2 = __( 'Old Event', 'event_espresso' );
-		$th3 = __( 'Old Ticket', 'event_espresso' );
-		$th4 = __( 'New Event', 'event_espresso' );
-		$th5 = __( 'New Ticket', 'event_espresso' );
-		$th6 = __( 'Price Change', 'event_espresso' );
+		// $th1 = __( 'Attendee Name', 'event_espresso' );
+		$th2 = esc_html__( 'Current Event', 'event_espresso' );
+		$th3 = esc_html__( 'Current Ticket', 'event_espresso' );
+		$th4 = esc_html__( 'New Event', 'event_espresso' );
+		$th5 = esc_html__( 'New Ticket', 'event_espresso' );
+		$th6 = esc_html__( 'Price Change', 'event_espresso' );
 		$this->setForm(
 			new \EE_Form_Section_Proper(
 				array(
@@ -81,7 +79,7 @@ class VerifyChanges extends Step {
 							\EEH_HTML::table(
 								\EEH_HTML::thead(
 									\EEH_HTML::tr(
-										\EEH_HTML::th( $th1 ) .
+										// \EEH_HTML::th( $th1 ) .
 										\EEH_HTML::th( $th2 ) .
 										\EEH_HTML::th( $th3 ) .
 										\EEH_HTML::th( $th4 ) .
@@ -91,13 +89,13 @@ class VerifyChanges extends Step {
 								) .
 								\EEH_HTML::tbody(
 									\EEH_HTML::tr(
-										\EEH_HTML::td(
-											$registration->attendee()->name(),
-											'',
-											'am-attendee-name-td',
-											'',
-											'data-th="' . $th1 . '"'
-										) .
+										// \EEH_HTML::td(
+										// 	$registration->attendee()->name(),
+										// 	'',
+										// 	'am-attendee-name-td',
+										// 	'',
+										// 	'data-th="' . $th1 . '"'
+										// ) .
 										\EEH_HTML::td(
 											$old_event->name(),
 											'',
@@ -145,8 +143,8 @@ class VerifyChanges extends Step {
 								'subsections'     => array(
 									'trigger_notifications' => new \EE_Yes_No_Input(
 										array(
-											'html_label_text' => __( 'Trigger Notifications?', 'event_espresso' ),
-											'html_help_text'  => __(
+											'html_label_text' => esc_html__( 'Trigger Notifications?', 'event_espresso' ),
+											'html_help_text'  => esc_html__(
 												'If "Yes" is selected, then notifications regarding these changes will be sent to the registration\'s contact.',
 												'event_espresso'
 											),
@@ -201,7 +199,7 @@ class VerifyChanges extends Step {
 			)
 		) {
 			EE_Error::add_attention(
-				__( 'Registration changes have been cancelled.', 'event_espresso' )
+				esc_html__( 'Registration changes have been cancelled.', 'event_espresso' )
 			);
 			EE_Error::get_notices( false, true );
 			wp_safe_redirect(
