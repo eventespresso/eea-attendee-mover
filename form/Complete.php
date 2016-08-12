@@ -36,8 +36,8 @@ class Complete extends Step
 		$this->setDisplayable();
 		parent::__construct(
 			4,
-			__( 'Complete', 'event_espresso' ),
-			__( '"Complete" Attendee Mover Step', 'event_espresso' ),
+			esc_html__( 'Complete', 'event_espresso' ),
+			esc_html__( '"Complete" Attendee Mover Step', 'event_espresso' ),
 			'complete',
 			'',
 			FormHandler::ADD_FORM_TAGS_AND_SUBMIT,
@@ -128,7 +128,7 @@ class Complete extends Step
 		$this->setRedirectTo( SequentialStepForm::REDIRECT_TO_OTHER );
 		\EE_Error::add_success(
 			sprintf(
-				__(
+				esc_html__(
 					'Registration ID:%1$s has been successfully cancelled, and Registration ID:%2$s has been created to replace it.',
 					'event_espresso'
 				),
