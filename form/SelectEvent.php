@@ -37,15 +37,18 @@ class SelectEvent extends Step {
 	public function __construct( \EE_Registry $registry ) {
 		parent::__construct(
 			1,
-			__( 'Select Event', 'event_espresso' ),
-			__( '"Select Event" Attendee Mover Step', 'event_espresso' ),
+			esc_html__( 'Select Event', 'event_espresso' ),
+			esc_html__( '"Select Event" Attendee Mover Step', 'event_espresso' ),
 			'select_event',
 			'',
 			FormHandler::ADD_FORM_TAGS_AND_SUBMIT,
 			$registry
 		);
+		add_filter(
+			'FHEE__EventEspresso_core_libraries_form_sections_form_handlers_SequentialStepFormManager__displayProgressSteps__before_steps',
+			array($this, 'registrantInformation')
+		);
 	}
-
 
 
 	/**
@@ -66,9 +69,10 @@ class SelectEvent extends Step {
 								'html_name'          => 'ee-select2-' . $this->slug(),
 								'html_id'            => 'ee-select2-' . $this->slug(),
 								'html_class'         => 'ee-select2',
-								'html_label_text'    => __( 'Select New Event', 'event_espresso' ),
+								'html_label_text'    => esc_html__( 'Select New Event', 'event_espresso' ),
 								'model_name'         => 'Event',
 								'display_field_name' => 'EVT_name',
+								'endpoint'           => 'events?include=EVT_name,Datetime.DTT_ID,Datetime.DTT_EVT_start',
 								'query_params'       => array(
 									0 => apply_filters(
                                         'FHEE__AttendeeMover_form_SelectEvent__generate__where_parameters',
