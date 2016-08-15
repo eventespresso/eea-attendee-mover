@@ -72,7 +72,7 @@ class SelectEvent extends Step {
 								'html_label_text'    => esc_html__( 'Select New Event', 'event_espresso' ),
 								'model_name'         => 'Event',
 								'display_field_name' => 'EVT_name',
-								'endpoint'           => 'events?include=EVT_name,Datetime.DTT_ID,Datetime.DTT_EVT_start',
+								'endpoint'           => 'events?include=EVT_name,Datetime.DTT_ID,Datetime.DTT_is_primary,Datetime.DTT_EVT_start,Datetime.DTT_EVT_end',
 								'query_params'       => array(
 									0 => apply_filters(
                                         'FHEE__AttendeeMover_form_SelectEvent__generate__where_parameters',
