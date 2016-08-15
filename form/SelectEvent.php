@@ -86,6 +86,11 @@ class SelectEvent extends Step {
 									'caps'  => \EEM_Base::caps_read_admin
 								),
 								'required'           => true,
+								'select2_args' => array(
+									'ajax' => array(
+										'data_interface' => 'EE_Attendee_Mover_Event_Select2',
+									),
+								),
 							)
 						),
 					)
@@ -93,6 +98,24 @@ class SelectEvent extends Step {
 			)
 		);
 		return $this->form();
+	}
+
+
+
+	/**
+	 * used for setting up css and js
+	 *
+	 * @return void
+	 * @throws LogicException
+	 * @throws \EE_Error
+	 */
+	public function enqueueStylesAndScripts() {
+		wp_enqueue_script(
+			'eea-attendee-mover-select-event',
+			EE_ATTENDEE_MOVER_URL . '/scripts/attendee-mover-event-selector.js',
+			array( 'form_section_select2_init' )
+		);
+		$this->form( false )->enqueue_js();
 	}
 
 
