@@ -57,9 +57,19 @@ class VerifyChanges extends Step {
 	 */
 	public function generate() {
 		$registration = $this->getRegistration( $this->REG_ID );
-		$old_event = $registration->event_obj();
+		try {
+			$old_event = $registration->event();
+			$old_event_name = $old_event->name();
+		} catch ( \Exception $e ) {
+			$old_event_name = esc_html__( 'Unknown Event', 'event_espresso' );
+			EE_Error::add_error( $e->getMessage(), __FILE__, __FUNCTION__, __LINE__ );
+		}
 		$old_ticket = $registration->ticket();
+		$old_ticket_name_and_info = $old_ticket->name_and_info();
 		$new_event = $this->getEvent( $this->EVT_ID );
+		$new_event_name = $new_event instanceof \EE_Event
+			? $new_event->name()
+			: esc_html__( 'Unknown Event', 'event_espresso' );
 		$new_ticket = $this->getTicket( $this->TKT_ID );
 		$price_change = $new_ticket->price() - $old_ticket->price();
 		$price_class = $price_change < 0 ? ' ee-txn-refund' : '';
@@ -97,21 +107,21 @@ class VerifyChanges extends Step {
 										// 	'data-th="' . $th1 . '"'
 										// ) .
 										\EEH_HTML::td(
-											$old_event->name(),
+											$old_event_name,
 											'',
 											'am-old-event-name-td',
 											'',
 											'data-th="' . $th2 . '"'
 										) .
 										\EEH_HTML::td(
-											$old_ticket->name_and_info(),
+											$old_ticket_name_and_info,
 											'',
 											'am-old-ticket-name-td',
 											'',
 											'data-th="' . $th3 . '"'
 										) .
 										\EEH_HTML::td(
-											$new_event->name(),
+											$new_event_name,
 											'',
 											'am-new-event-name-td',
 											'',
@@ -145,7 +155,7 @@ class VerifyChanges extends Step {
 										array(
 											'html_label_text' => esc_html__( 'Trigger Notifications?', 'event_espresso' ),
 											'html_help_text'  => esc_html__(
-												'If "Yes" is selected, then notifications regarding these changes will be sent to the registration\'s contact.',
+												'If "Yes" is selected, then notifications regarding these changes will be sent to the registration\'s contact (for example: Registration Approved (Event Admin context) + Registration Approved (Primary Registrant context), etc).',
 												'event_espresso'
 											),
 										)
