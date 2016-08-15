@@ -184,9 +184,28 @@ abstract class Step extends SequentialStepForm {
 	 * @return string
 	 */
 	public function registrantInformation() {
-		$registration = $this->getRegistration( $this->REG_ID );
-		$ticket = $this->getCurrentTicket();
-		$event = $registration->event();
+
+		$attendee_name = esc_html__( 'Unknown', 'event_espresso' );
+		$EVT_ID = 0;
+		$event_name = esc_html__( 'Unknown Event', 'event_espresso' );
+		$TKT_ID = 0;
+		$ticket_name_and_price = esc_html__( 'Unknown Ticket', 'event_espresso' );
+
+		try {
+			$registration = $this->getRegistration( $this->REG_ID );
+			$attendee_name = $registration->attendee()->full_name();
+			$ticket = $this->getCurrentTicket();
+			$TKT_ID = $ticket->ID();
+			$ticket_name_and_price = $ticket->name() . ' : ' . $ticket->pretty_price();
+			$event = $registration->event();
+			if ( $event instanceof EE_Event ) {
+				$event_name = $event->name();
+				$EVT_ID = $event->ID();
+			}
+		} catch ( \Exception $e ) {
+			\EE_Error::add_error( $e->getMessage(), __FILE__, __FUNCTION__, __LINE__ );
+		}
+
 		return \EEH_HTML::div(
 			\EEH_HTML::h4( esc_html__( 'Current Registration Information', 'event_espresso' ) )
 			.
@@ -197,10 +216,10 @@ abstract class Step extends SequentialStepForm {
 				'display:inline-block; width:120px; white-space: nowrap;'
 			)
 			.
-			\EEH_HTML::span( $registration->attendee()->full_name(), '', '', 'margin-left: 1em; white-space: nowrap;' )
+			\EEH_HTML::span( $attendee_name, '', '', 'margin-left: 1em; white-space: nowrap;' )
 			.
 			\EEH_HTML::span(
-				sprintf( esc_html__( ' ( ID: %1$d ) ', 'event_espresso' ), $registration->ID() ),
+				sprintf( esc_html__( ' ( ID: %1$d ) ', 'event_espresso' ), $this->REG_ID ),
 				'',
 				'',
 				'color:#999999; font-size:.8em; margin-left: 1em; white-space: nowrap;'
@@ -215,10 +234,10 @@ abstract class Step extends SequentialStepForm {
 				'display:inline-block; width:120px; white-space: nowrap;'
 			)
 			.
-			\EEH_HTML::span( $event->name(), '', '', 'margin-left: 1em; white-space: nowrap;' )
+			\EEH_HTML::span( $event_name, '', '', 'margin-left: 1em; white-space: nowrap;' )
 			.
 			\EEH_HTML::span(
-				sprintf( esc_html__( ' ( ID: %1$d ) ', 'event_espresso' ), $event->ID() ),
+				sprintf( esc_html__( ' ( ID: %1$d ) ', 'event_espresso' ), $EVT_ID ),
 				'',
 				'',
 				'color:#999999; font-size:.8em; margin-left: 1em; white-space: nowrap;'
@@ -234,14 +253,14 @@ abstract class Step extends SequentialStepForm {
 			)
 			.
 			\EEH_HTML::span(
-				$ticket->name() . ' : ' . $ticket->pretty_price(),
+				$ticket_name_and_price,
 				'',
 				'',
 				'margin-left: 1em; white-space: nowrap;'
 			)
 			.
 			\EEH_HTML::span(
-				sprintf( esc_html__( ' ( ID: %1$d ) ', 'event_espresso' ), $ticket->ID() ),
+				sprintf( esc_html__( ' ( ID: %1$d ) ', 'event_espresso' ), $TKT_ID ),
 				'',
 				'',
 				'color:#999999; font-size:.8em; margin-left: 1em; white-space: nowrap;'
