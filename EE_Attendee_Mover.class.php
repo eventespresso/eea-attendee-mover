@@ -26,6 +26,7 @@ Class  EE_Attendee_Mover extends EE_Addon {
 				'version'               => EE_ATTENDEE_MOVER_VERSION,
 				'plugin_slug'           => 'attendee_mover',
 				'min_core_version'      => EE_ATTENDEE_MOVER_CORE_VERSION_REQUIRED,
+				'min_wp_version'        => EE_ATTENDEE_MOVER_WP_VERSION_REQUIRED,
 				'main_file_path'        => EE_ATTENDEE_MOVER_PLUGIN_FILE,
 				'module_paths'          => array( EE_ATTENDEE_MOVER_PATH . 'EED_Attendee_Mover.module.php' ),
 
