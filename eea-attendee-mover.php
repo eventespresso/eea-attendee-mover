@@ -63,11 +63,6 @@ add_action( 'activated_plugin', 'espresso_attendee_mover_plugin_activation_error
  *    registers addon with EE core
  */
 function load_espresso_attendee_mover() {
-	global $wp_version;
-	if( version_compare( $wp_version, EE_ATTENDEE_MOVER_WP_VERSION_REQUIRED, '<' ) ) {
-		add_action( 'admin_notices', 'espresso_attendee_mover_wp_version_error' );
-		return;
-	}
 	if ( class_exists( 'EE_Addon' )) {
       // attendee_mover version
       require_once ( plugin_dir_path( __FILE__ ) . 'EE_Attendee_Mover.class.php' );
@@ -89,24 +84,6 @@ function espresso_attendee_mover_activation_check() {
   }
 }
 add_action( 'init', 'espresso_attendee_mover_activation_check', 1 );
-
-
-
-/**
- *    displays activation error admin notice
- */
-function espresso_attendee_mover_wp_version_error() {
-  unset( $_GET[ 'activate' ],  $_REQUEST[ 'activate' ] );
-  if ( ! function_exists( 'deactivate_plugins' ) ) {
-    require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-  }
-  deactivate_plugins( plugin_basename( EE_ATTENDEE_MOVER_PLUGIN_FILE ) );
-  ?>
-  <div class="error">
-    <p><?php printf( __( 'Event Espresso Attendee Mover could not be activated because it requires WordPress version %1$s or greater. Please update your version of WordPress to use the Attendee Mover addon and to keep your site secure.', 'event_espresso' ), EE_ATTENDEE_MOVER_WP_VERSION_REQUIRED ); ?></p>
-  </div>
-<?php
-}
 
 
 
