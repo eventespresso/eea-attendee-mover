@@ -7,6 +7,7 @@ function EE_Attendee_Mover_Event_Select2( data_interface_args ) {
 	this.default_query_params = data_interface_args.default_query_params || {};
 	this.items_per_page = this.default_query_params.limit || 10;
 	this.nonce = data_interface_args.nonce;
+	this.locale = data_interface_args.locale;
 
 	/**
 	 * Changes the request params set by select2 and prepares them for an EE4 REST request
@@ -27,6 +28,7 @@ function EE_Attendee_Mover_Event_Select2( data_interface_args ) {
 		new_params.where.EVT_name= [ 'like', '%' + search_term + '%' ];
 		new_params.include='EVT_ID, EVT_name, Datetime.DTT_name, Datetime.DTT_EVT_start, Datetime.DTT_EVT_end, Datetime.DTT_is_primary';
 		new_params._wpnonce = this.nonce;
+		// console_log_object( 'new_params', new_params, 0 );
 		return new_params;
 	};
 
@@ -69,19 +71,18 @@ function EE_Attendee_Mover_Event_Select2( data_interface_args ) {
 					secs = Date.parse( data[i].datetimes[j].DTT_EVT_start );
 					// start date
 					start_date = new Date( secs );
-					start_date_string = start_date.toLocaleString("en-us", { month: "short" }) + ' ' + start_date.getDate();
+					start_date_string = start_date.toLocaleString( this.locale, { month: "short" }) + ' ' + start_date.getDate();
 					preferred_datetime_text += start_date_string;
 					// end date
 					secs     = Date.parse( data[ i ].datetimes[ j ].DTT_EVT_end );
 					end_date = new Date( secs );
-					end_date_string = end_date.toLocaleString( "en-us", { month : "short" } ) + ' ' + end_date.getDate();
+					end_date_string = end_date.toLocaleString( this.locale, { month : "short" } ) + ' ' + end_date.getDate();
 					if ( end_date_string !== start_date_string ) {
 						preferred_datetime_text += ' - ' + end_date_string;
 					}
 
 				}
 			}
-			// console_log_object( 'preferred_datetime_text', preferred_datetime_text, 0 );
 			formatted_results.push(
 				{
 					id: data[i]['EVT_ID'],
