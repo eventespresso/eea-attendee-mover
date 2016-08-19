@@ -214,22 +214,27 @@ class EED_Attendee_Mover extends EED_Module {
 			),
 			'metaboxes'     => array_merge(
 				$admin_page->default_espresso_metaboxes(),
-				array(
-					function () {
-						add_meta_box(
-							'edit-attendee-selection-mbox',
-							esc_html__( 'Change Event/Ticket Selection', 'event_espresso' ),
-							array( 'EED_Attendee_Mover', 'edit_attendee_selections_meta_box' ),
-							EED_Attendee_Mover::$admin_page->wp_page_slug(),
-							'normal',
-							'high'
-						);
-					}
-				)
+				array( 'add_edit_attendee_selections_meta_box' )
 			),
 			'require_nonce' => true
 		);
 		return $page_config;
+	}
+
+
+
+	/**
+	 * @return void
+	 */
+	public static function add_edit_attendee_selections_meta_box() {
+		add_meta_box(
+			'edit-attendee-selection-mbox',
+			esc_html__( 'Change Event/Ticket Selection', 'event_espresso' ),
+			array( 'EED_Attendee_Mover', 'edit_attendee_selections_meta_box' ),
+			EED_Attendee_Mover::$admin_page->wp_page_slug(),
+			'normal',
+			'high'
+		);
 	}
 
 
