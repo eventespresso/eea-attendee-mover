@@ -90,7 +90,7 @@ class SelectEvent extends Step {
 									'ajax' => array(
 										'data_interface' => 'EE_Attendee_Mover_Event_Select2',
 									),
-									'placeholder' => esc_html__( 'please select an event', 'event_espresso' ),
+									'placeholder' => esc_html__( 'type event name to search, or click to view all', 'event_espresso' ),
 									'allowClear'  => true
 								),
 							)
