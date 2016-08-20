@@ -214,7 +214,7 @@ class EED_Attendee_Mover extends EED_Module {
 			),
 			'metaboxes'     => array_merge(
 				$admin_page->default_espresso_metaboxes(),
-				array( 'add_edit_attendee_selections_meta_box' )
+				array( array( 'EED_Attendee_Mover', 'add_edit_attendee_selections_meta_box' ))
 			),
 			'require_nonce' => true
 		);
