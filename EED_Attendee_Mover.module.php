@@ -558,6 +558,7 @@ class EED_Attendee_Mover extends EED_Module {
 	 *  @return 	void
 	 */
 	public function enqueue_scripts() {
+		wp_deregister_script( 'espresso_reg' );
 		// EE attendee_mover style
 		wp_register_style(
 			'espresso_attendee_mover',
