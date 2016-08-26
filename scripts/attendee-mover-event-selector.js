@@ -60,6 +60,7 @@ function EE_Attendee_Mover_Event_Select2( data_interface_args ) {
 			var start_date_string = '';
 			var end_date = null;
 			var end_date_string = '';
+			moment.locale( this.locale );
 
 			for( var j=0; j<data[i].datetimes.length; j++) {
 				if( data[i].datetimes[j].DTT_is_primary || preferred_datetime_text == '' ) {
@@ -70,13 +71,13 @@ function EE_Attendee_Mover_Event_Select2( data_interface_args ) {
 					// console_log_object( 'DTT_EVT_end', data[ i ].datetimes[ j ].DTT_EVT_end, 0 );
 					secs = Date.parse( data[i].datetimes[j].DTT_EVT_start );
 					// start date
-					start_date = new Date( secs );
-					start_date_string = start_date.toLocaleString( this.locale, { month: "short" }) + ' ' + start_date.getDate();
+					start_date        = moment( new Date( secs ) );
+					start_date_string = start_date.format( "MMM YYYY" );
 					preferred_datetime_text += start_date_string;
 					// end date
 					secs     = Date.parse( data[ i ].datetimes[ j ].DTT_EVT_end );
-					end_date = new Date( secs );
-					end_date_string = end_date.toLocaleString( this.locale, { month : "short" } ) + ' ' + end_date.getDate();
+					end_date        = moment( new Date( secs ) );
+					end_date_string = end_date.format( "MMM YYYY" );
 					if ( end_date_string !== start_date_string ) {
 						preferred_datetime_text += ' - ' + end_date_string;
 					}
