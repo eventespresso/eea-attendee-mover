@@ -78,8 +78,11 @@ class SelectTicket extends Step {
 							if ( ! isset( $tickets_by_datetime[ $datetime->name() ] ) ) {
 								$tickets_by_datetime[ $datetime->name() ] = array();
 							}
+							$ticket_info = $ticket->real_quantity_on_ticket( 'saleable' )
+								? $ticket->pretty_price()
+								: esc_html__( 'sold out', 'event_espresso' );
 							$tickets_by_datetime[ $datetime->name() ][ $ticket->ID() ]
-								= $ticket->name() . ' : ' . $ticket->pretty_price() . $selected;
+								= $ticket->name() . ' : ' . $ticket_info . $selected;
 						}
 					}
 				}
