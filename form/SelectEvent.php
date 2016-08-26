@@ -112,10 +112,26 @@ class SelectEvent extends Step {
 	 * @throws \EE_Error
 	 */
 	public function enqueueStylesAndScripts() {
+		wp_register_script(
+			'ee-moment-core',
+			EE_THIRD_PARTY_URL . 'moment/moment-with-locales.min.js',
+			array(),
+			EVENT_ESPRESSO_VERSION,
+			true
+		);
+		wp_register_script(
+			'ee-moment',
+			EE_THIRD_PARTY_URL . 'moment/moment-timezone-with-data.min.js',
+			array( 'ee-moment-core' ),
+			EVENT_ESPRESSO_VERSION,
+			true
+		);
 		wp_enqueue_script(
 			'eea-attendee-mover-select-event',
 			EE_ATTENDEE_MOVER_URL . '/scripts/attendee-mover-event-selector.js',
-			array( 'form_section_select2_init' )
+			array( 'form_section_select2_init', 'ee-moment' ),
+			EE_ATTENDEE_MOVER_VERSION,
+			true
 		);
 		$this->form( false )->enqueue_js();
 	}
