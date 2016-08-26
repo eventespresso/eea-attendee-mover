@@ -26,7 +26,7 @@ function EE_Attendee_Mover_Event_Select2( data_interface_args ) {
 		}
 		var search_term = params.term || '';
 		new_params.where.EVT_name= [ 'like', '%' + search_term + '%' ];
-		new_params.include='EVT_ID, EVT_name, Datetime.DTT_name, Datetime.DTT_EVT_start, Datetime.DTT_EVT_end, Datetime.DTT_is_primary';
+		new_params.include='EVT_ID, EVT_name, Datetime.DTT_name, Datetime.DTT_EVT_start, Datetime.DTT_EVT_end, Datetime.DTT_is_primary, Datetime.DTT_reg_limit, Datetime.DTT_sold';
 		new_params._wpnonce = this.nonce;
 		// console_log_object( 'new_params', new_params, 0 );
 		return new_params;
@@ -60,6 +60,8 @@ function EE_Attendee_Mover_Event_Select2( data_interface_args ) {
 			var start_date_string = '';
 			var end_date = null;
 			var end_date_string = '';
+			var reg_limit = 999999;
+			var sold = 0;
 			moment.locale( this.locale );
 
 			for( var j=0; j<data[i].datetimes.length; j++) {
@@ -81,13 +83,18 @@ function EE_Attendee_Mover_Event_Select2( data_interface_args ) {
 					if ( end_date_string !== start_date_string ) {
 						preferred_datetime_text += ' - ' + end_date_string;
 					}
+					reg_limit = parseInt( data[ i ].datetimes[ j ].DTT_reg_limit  );
+					sold = parseInt( data[ i ].datetimes[ j ].DTT_sold  );
+					if ( reg_limit <= sold ) {
+						preferred_datetime_text += ' : ' + eei18n.attendee_mover_sold_out_datetime;
+					}
 
 				}
 			}
 			formatted_results.push(
 				{
 					id: data[i]['EVT_ID'],
-					text: data[i]['EVT_name'] + ' (' + preferred_datetime_text + ')'
+					text: data[i]['EVT_name'] + ' ( ' + preferred_datetime_text + ' )'
 				}
 			);
 		}
