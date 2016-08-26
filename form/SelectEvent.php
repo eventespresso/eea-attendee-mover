@@ -133,6 +133,7 @@ class SelectEvent extends Step {
 			EE_ATTENDEE_MOVER_VERSION,
 			true
 		);
+		\EE_Registry::$i18n_js_strings['attendee_mover_sold_out_datetime'] = esc_html__( 'sold out', 'event_espresso' );
 		$this->form( false )->enqueue_js();
 	}
 
