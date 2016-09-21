@@ -84,14 +84,16 @@ class MoveAttendeeCommandHandler extends CommandHandler
 
 
 
-    /**
-     * @param CommandInterface $command
-     * @throws \RuntimeException
-     * @throws \EventEspresso\core\exceptions\EntityNotFoundException
-     * @throws \EventEspresso\core\exceptions\UnexpectedEntityException
-     * @throws \OutOfRangeException
-     * @return mixed
-     */
+	/**
+	 * @param CommandInterface $command
+	 * @return mixed
+	 * @throws \RuntimeException
+	 * @throws \EventEspresso\core\exceptions\EntityNotFoundException
+	 * @throws \EventEspresso\core\exceptions\UnexpectedEntityException
+	 * @throws \OutOfRangeException
+	 * @throws \EventEspresso\core\exceptions\InvalidEntityException
+	 * @throws \EE_Error
+	 */
     public function handle(CommandInterface $command)
     {
         /** @var MoveAttendeeCommand $command */
@@ -120,7 +122,7 @@ class MoveAttendeeCommandHandler extends CommandHandler
         // and registration payments
         $this->copy_registration_service->copyPaymentDetails($new_registration, $old_registration);
         // now cancel original registration and it's ticket line item
-        $this->cancel_registration_service->cancelRegistrationAndTicketLineItem($old_registration);
+        $this->cancel_registration_service->cancelRegistrationAndTicketLineItem($old_registration, false);
         // perform final status updates and trigger notifications
         $this->update_registration_service->updateRegistrationAndTransaction($command->registration());
         // tag registrations for identification purposes
