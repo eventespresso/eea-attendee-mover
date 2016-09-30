@@ -30,6 +30,26 @@ General Styles
 	width: auto !important;
 }
 
+.eea-attendee-mover-current-reg-info-div {
+    background: #fafafa;
+    margin: 1em 0 3em;
+    padding: .25em 2em 2em;
+}
+.eea-attendee-mover-current-reg-info-div span {
+    white-space: nowrap;
+}
+.eea-attendee-mover-current-reg-info-label-spn {
+    display: inline-block;
+    width: 120px;
+}
+.eea-attendee-mover-current-reg-info-spn {
+    margin-left: 1em;
+}
+.eea-attendee-mover-current-reg-info-id-spn {
+    color: #999999;
+    font-size: .8em;
+}
+
 /* Media Query for screens smaller then 768px (iPad portrait)
 ---------------------------------------------------------------------------------------------------- */
 

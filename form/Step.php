@@ -212,17 +212,15 @@ abstract class Step extends SequentialStepForm {
 			\EEH_HTML::span(
 				esc_html__( 'Attendee Name: ', 'event_espresso' ),
 				'',
-				'',
-				'display:inline-block; width:120px; white-space: nowrap;'
+				'eea-attendee-mover-current-reg-info-label-spn'
 			)
 			.
-			\EEH_HTML::span( $attendee_name, '', '', 'margin-left: 1em; white-space: nowrap;' )
+			\EEH_HTML::span( $attendee_name, '', 'eea-attendee-mover-current-reg-info-spn' )
 			.
 			\EEH_HTML::span(
 				sprintf( esc_html__( ' ( ID: %1$d ) ', 'event_espresso' ), $this->REG_ID ),
 				'',
-				'',
-				'color:#999999; font-size:.8em; margin-left: 1em; white-space: nowrap;'
+				'eea-attendee-mover-current-reg-info-spn eea-attendee-mover-current-reg-info-id-spn'
 			)
 			.
 			\EEH_HTML::br()
@@ -230,17 +228,15 @@ abstract class Step extends SequentialStepForm {
 			\EEH_HTML::span(
 				esc_html__( 'Current Event: ', 'event_espresso' ),
 				'',
-				'',
-				'display:inline-block; width:120px; white-space: nowrap;'
-			)
+                'eea-attendee-mover-current-reg-info-label-spn'
+            )
 			.
-			\EEH_HTML::span( $event_name, '', '', 'margin-left: 1em; white-space: nowrap;' )
+			\EEH_HTML::span( $event_name, '', 'eea-attendee-mover-current-reg-info-spn' )
 			.
 			\EEH_HTML::span(
 				sprintf( esc_html__( ' ( ID: %1$d ) ', 'event_espresso' ), $EVT_ID ),
 				'',
-				'',
-				'color:#999999; font-size:.8em; margin-left: 1em; white-space: nowrap;'
+				'eea-attendee-mover-current-reg-info-spn eea-attendee-mover-current-reg-info-id-spn'
 			)
 			.
 			\EEH_HTML::br()
@@ -248,26 +244,22 @@ abstract class Step extends SequentialStepForm {
 			\EEH_HTML::span(
 				esc_html__( 'Current Ticket: ', 'event_espresso' ),
 				'',
-				'',
-				'display:inline-block; width:120px; white-space: nowrap;'
-			)
+                'eea-attendee-mover-current-reg-info-label-spn'
+            )
 			.
 			\EEH_HTML::span(
 				$ticket_name_and_price,
 				'',
-				'',
-				'margin-left: 1em; white-space: nowrap;'
+				'eea-attendee-mover-current-reg-info-spn'
 			)
 			.
 			\EEH_HTML::span(
 				sprintf( esc_html__( ' ( ID: %1$d ) ', 'event_espresso' ), $TKT_ID ),
 				'',
-				'',
-				'color:#999999; font-size:.8em; margin-left: 1em; white-space: nowrap;'
+				'eea-attendee-mover-current-reg-info-spn eea-attendee-mover-current-reg-info-id-spn'
 			),
 			'',
-			'',
-			'background:#fafafa; font-size:.85em; margin:1em 0 3em; padding:.25em 2em 2em;'
+			'eea-attendee-mover-current-reg-info-div'
 		);
 	}
 
