@@ -5,6 +5,8 @@ use EE_Datetime;
 use EE_Event;
 use EE_Form_Section_Proper;
 use EE_Ticket;
+use EventEspresso\core\exceptions\EntityNotFoundException;
+use EventEspresso\core\exceptions\InvalidFormSubmissionException;
 use EventEspresso\core\libraries\form_sections\form_handlers\FormHandler;
 use EventEspresso\core\libraries\form_sections\form_handlers\SequentialStepForm;
 use InvalidArgumentException;
@@ -131,18 +133,19 @@ class SelectTicket extends Step {
 
 
 
-	/**
-	 * handles processing the form submission
-	 * returns true or false depending on whether the form was processed successfully or not
-	 *
-	 * @param array $form_data
-	 * @return bool
-	 * @throws \LogicException
-	 * @throws \EventEspresso\core\exceptions\InvalidFormSubmissionException
-	 * @throws \EE_Error
-	 * @throws \InvalidArgumentException
-	 * @throws InvalidDataTypeException
-	 */
+    /**
+     * handles processing the form submission
+     * returns true or false depending on whether the form was processed successfully or not
+     *
+     * @param array $form_data
+     * @return bool
+     * @throws \InvalidArgumentException
+     * @throws InvalidDataTypeException
+     * @throws \LogicException
+     * @throws InvalidFormSubmissionException
+     * @throws EntityNotFoundException
+     * @throws \EE_Error
+     */
 	public function process( $form_data = array() ) {
 		$valid_data = (array) parent::process( $form_data );
 		if ( empty( $valid_data ) ) {
@@ -156,7 +159,7 @@ class SelectTicket extends Step {
 			if ( $registration instanceof \EE_Registration ) {
 				$existing_ticket_ID = $registration->ticket_ID();
 				if ( $TKT_ID === $existing_ticket_ID ) {
-					throw new \RuntimeException(
+					throw new InvalidFormSubmissionException(
 						esc_html__(
 							'Registrations can not be moved if you select the exact same ticket that the registration already has! Please select a different ticket.',
 							'event_espresso'
