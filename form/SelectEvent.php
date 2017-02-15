@@ -128,7 +128,7 @@ class SelectEvent extends Step {
 		);
 		wp_enqueue_script(
 			'eea-attendee-mover-select-event',
-			EE_ATTENDEE_MOVER_URL . '/scripts/attendee-mover-event-selector.js',
+			EE_ATTENDEE_MOVER_URL . 'scripts/attendee-mover-event-selector.js',
 			array( 'form_section_select2_init', 'ee-moment' ),
 			EE_ATTENDEE_MOVER_VERSION,
 			true
