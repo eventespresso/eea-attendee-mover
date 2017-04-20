@@ -15,6 +15,6 @@ define('EEA_ATTENDEE_MOVER_TESTS_DIR', EEA_ATTENDEE_MOVER_PLUGIN_DIR . 'tests');
 $addon_loader = new AddonLoader(
     EEA_ATTENDEE_MOVER_TESTS_DIR,
     EEA_ATTENDEE_MOVER_PLUGIN_DIR,
-    'eea-people-addon.php'
+    'eea-attendee-mover.php'
 );
 $addon_loader->init();
