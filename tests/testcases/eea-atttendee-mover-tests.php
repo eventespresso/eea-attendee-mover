@@ -15,7 +15,7 @@ class eea_attendee_mover_tests extends EE_UnitTestCase
      */
     function test_loading_new_addon()
     {
-        $this->assertEquals(has_action('AHEE__EE_System__load_espresso_addons', 'load_espresso_new_addon'), 10);
+        $this->assertEquals(10, has_action('AHEE__EE_System__load_espresso_addons', 'load_espresso_attendee_mover'));
         $this->assertTrue(class_exists('EE_Attendee_Mover'));
     }
 }
