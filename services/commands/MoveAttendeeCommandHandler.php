@@ -1,19 +1,24 @@
 <?php
+
 namespace EventEspresso\AttendeeMover\services\commands;
 
+use EE_Error;
+use EE_Registration;
+use EE_Ticket;
 use EventEspresso\core\domain\services\registration\CancelRegistrationService;
 use EventEspresso\core\domain\services\registration\CopyRegistrationService;
 use EventEspresso\core\domain\services\registration\CreateRegistrationService;
 use EventEspresso\core\domain\services\registration\UpdateRegistrationService;
 use EventEspresso\core\domain\services\ticket\CreateTicketLineItemService;
+use EventEspresso\core\exceptions\EntityNotFoundException;
 use EventEspresso\core\exceptions\InvalidEntityException;
+use EventEspresso\core\exceptions\UnexpectedEntityException;
 use EventEspresso\core\services\commands\CommandHandler;
 use EventEspresso\core\services\commands\CommandInterface;
+use OutOfRangeException;
+use RuntimeException;
 
-if ( ! defined('EVENT_ESPRESSO_VERSION')) {
-    exit('No direct script access allowed');
-}
-
+defined('EVENT_ESPRESSO_VERSION') || exit('No direct script access allowed');
 
 
 /**
@@ -84,20 +89,20 @@ class MoveAttendeeCommandHandler extends CommandHandler
 
 
 
-	/**
-	 * @param CommandInterface $command
-	 * @return mixed
-	 * @throws \RuntimeException
-	 * @throws \EventEspresso\core\exceptions\EntityNotFoundException
-	 * @throws \EventEspresso\core\exceptions\UnexpectedEntityException
-	 * @throws \OutOfRangeException
-	 * @throws \EventEspresso\core\exceptions\InvalidEntityException
-	 * @throws \EE_Error
-	 */
+    /**
+     * @param CommandInterface $command
+     * @return mixed
+     * @throws RuntimeException
+     * @throws EntityNotFoundException
+     * @throws UnexpectedEntityException
+     * @throws OutOfRangeException
+     * @throws InvalidEntityException
+     * @throws EE_Error
+     */
     public function handle(CommandInterface $command)
     {
         /** @var MoveAttendeeCommand $command */
-        if ( ! $command instanceof MoveAttendeeCommand) {
+        if (! $command instanceof MoveAttendeeCommand) {
             throw new InvalidEntityException(get_class($command), 'MoveAttendeeCommand');
         }
         $old_registration = $command->registration();
@@ -107,7 +112,7 @@ class MoveAttendeeCommandHandler extends CommandHandler
         // get transaction for original registration
         $transaction = $old_registration->transaction();
         // create new line item for new ticket
-        $ticket_line_item = $this->create_ticket_line_item_service->create($transaction, $new_ticket, 1);
+        $ticket_line_item = $this->create_ticket_line_item_service->create($transaction, $new_ticket);
         // then generate a new registration from that
         $new_registration = $this->create_registration_service->create(
             $new_ticket->get_related_event(),
@@ -124,7 +129,7 @@ class MoveAttendeeCommandHandler extends CommandHandler
         // now cancel original registration and it's ticket line item
         $this->cancel_registration_service->cancelRegistrationAndTicketLineItem($old_registration, false);
         // perform final status updates and trigger notifications
-        $this->update_registration_service->updateRegistrationAndTransaction($command->registration());
+        $this->update_registration_service->updateRegistrationAndTransaction($new_registration);
         // tag registrations for identification purposes
         $this->addExtraMeta($old_registration, $new_registration, $new_ticket);
         return $new_registration;
@@ -133,15 +138,15 @@ class MoveAttendeeCommandHandler extends CommandHandler
 
 
     /**
-     * @param \EE_Registration $registration
-     * @param \EE_Ticket       $new_ticket
-     * @return bool
-     * @throws \RuntimeException
-     * @throws \EE_Error
+     * @param EE_Registration $registration
+     * @param EE_Ticket       $new_ticket
+     * @return void
+     * @throws RuntimeException
+     * @throws EE_Error
      */
     protected function checkIfRegistrationChangeAlreadyProcessed(
-        \EE_Registration $registration,
-        \EE_Ticket $new_ticket
+        EE_Registration $registration,
+        EE_Ticket $new_ticket
     ) {
         $reg_moved = $registration->get_extra_meta('registration-moved-to', true, array());
         if (isset($reg_moved['TKT_ID']) && $reg_moved['TKT_ID'] === $new_ticket->ID()) {
@@ -152,7 +157,7 @@ class MoveAttendeeCommandHandler extends CommandHandler
                 ),
                 REG_ADMIN_URL
             );
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 sprintf(
                     __(
                         'This exact registration change has already been processed. Please select a different event and/or ticket to change this registration. %3$sThe original cancelled registration can be viewed on the %1$sregistration details admin page%2$s.',
@@ -169,14 +174,15 @@ class MoveAttendeeCommandHandler extends CommandHandler
 
 
     /**
-     * @param \EE_Registration $old_registration
-     * @param \EE_Registration $new_registration
-     * @param \EE_Ticket       $new_ticket
+     * @param EE_Registration $old_registration
+     * @param EE_Registration $new_registration
+     * @param EE_Ticket       $new_ticket
+     * @throws EE_Error
      */
     protected function addExtraMeta(
-        \EE_Registration $old_registration,
-        \EE_Registration $new_registration,
-        \EE_Ticket $new_ticket
+        EE_Registration $old_registration,
+        EE_Registration $new_registration,
+        EE_Ticket $new_ticket
     ) {
         // tag the old registration as moved
         $old_registration->add_extra_meta(
