@@ -130,7 +130,7 @@ class Complete extends Step
         $new_registration = $this->registry->BUS->execute(
             $this->registry->create(
                 'EventEspresso\AttendeeMover\services\commands\MoveAttendeeCommand',
-                array($old_registration, $new_ticket)
+                array($old_registration, $new_ticket, $this->notify())
             )
         );
         if (! $new_registration instanceof EE_Registration) {
