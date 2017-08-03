@@ -107,8 +107,6 @@ class MoveAttendeeCommandHandler extends CommandHandler
         }
         $old_registration = $command->registration();
         $new_ticket = $command->ticket();
-        // bamboozle EED_Messages into sending notifications by tweaking the request vars
-        $_REQUEST['txn_reg_status_change']['send_notifications'] = (int)$command->triggerNotifications();
         // have we already processed this registration change ? if so, then bail...
         $this->checkIfRegistrationChangeAlreadyProcessed($old_registration, $new_ticket);
         // get transaction for original registration
@@ -130,8 +128,10 @@ class MoveAttendeeCommandHandler extends CommandHandler
         $this->copy_registration_service->copyPaymentDetails($new_registration, $old_registration);
         // now cancel original registration and it's ticket line item
         $this->cancel_registration_service->cancelRegistrationAndTicketLineItem($old_registration, false);
+        // bamboozle EED_Messages into sending notifications by tweaking the request vars
+        $_REQUEST['txn_reg_status_change']['send_notifications'] = (int)$command->triggerNotifications();
         // perform final status updates and trigger notifications
-        $this->update_registration_service->updateRegistrationAndTransaction($new_registration);
+        $this->update_registration_service->updateRegistrationAndTransaction($command->registration());
         // tag registrations for identification purposes
         $this->addExtraMeta($old_registration, $new_registration, $new_ticket);
         return $new_registration;
