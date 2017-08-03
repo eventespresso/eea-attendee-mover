@@ -209,10 +209,10 @@ class VerifyChanges extends Step
         }
         // check that it was the submit button that was clicked and not the cancel button
         if (
-        ! (
-            isset($valid_data['verify_changes-submit-btn'])
-            && $valid_data['verify_changes-submit-btn'] === $this->submitBtnText()
-        )
+            ! (
+                isset($valid_data['verify_changes-submit-btn'])
+                && $valid_data['verify_changes-submit-btn'] === $this->submitBtnText()
+            )
         ) {
             EE_Error::add_attention(
                 esc_html__('Registration changes have been cancelled.', 'event_espresso')
@@ -230,14 +230,16 @@ class VerifyChanges extends Step
             exit();
         }
         if (
-            isset($valid_data['trigger_notifications'])
-            && $valid_data['trigger_notifications'] === true
+            isset($valid_data['notifications'], $valid_data['notifications']['trigger_send'])
+            && $valid_data['notifications']['trigger_send'] === true
         ) {
             // send out notifications
+            $this->setNotify();
             add_filter('FHEE__EED_Messages___maybe_registration__deliver_notifications', '__return_true', 10);
         } else {
             add_filter('FHEE__EED_Messages___maybe_registration__deliver_notifications', '__return_false', 15);
         }
+        $this->addRedirectArgs(array('ee-notify' => $this->notify));
         $this->setRedirectTo(SequentialStepForm::REDIRECT_TO_NEXT_STEP);
         return true;
     }
