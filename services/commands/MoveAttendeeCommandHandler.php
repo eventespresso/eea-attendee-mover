@@ -107,6 +107,8 @@ class MoveAttendeeCommandHandler extends CommandHandler
         }
         $old_registration = $command->registration();
         $new_ticket = $command->ticket();
+        // bamboozle EED_Messages into sending notifications by tweaking the request vars
+        $_REQUEST['txn_reg_status_change']['send_notifications'] = (int)$command->triggerNotifications();
         // have we already processed this registration change ? if so, then bail...
         $this->checkIfRegistrationChangeAlreadyProcessed($old_registration, $new_ticket);
         // get transaction for original registration
