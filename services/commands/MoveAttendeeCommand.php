@@ -1,14 +1,16 @@
 <?php
+
 namespace EventEspresso\AttendeeMover\services\commands;
 
+use EE_Error;
+use EE_Registration;
+use EE_Ticket;
 use EventEspresso\core\domain\services\capabilities\CapCheck;
+use EventEspresso\core\exceptions\InvalidDataTypeException;
 use EventEspresso\core\services\commands\Command;
 use EventEspresso\core\services\commands\CommandRequiresCapCheckInterface;
 
-if ( ! defined('EVENT_ESPRESSO_VERSION')) {
-    exit('No direct script access allowed');
-}
-
+defined('EVENT_ESPRESSO_VERSION') || exit('No direct script access allowed');
 
 
 /**
@@ -25,40 +27,50 @@ class MoveAttendeeCommand extends Command implements CommandRequiresCapCheckInte
 {
 
     /**
-     * @var \EE_Registration $registration
+     * @var EE_Registration $registration
      */
     private $registration;
 
     /**
-     * @var \EE_Ticket $ticket
+     * @var EE_Ticket $ticket
      */
     private $ticket;
+
+    /**
+     * @var bool $trigger_notifications
+     */
+    protected $trigger_notifications;
 
 
 
     /**
      * MoveAttendeeCommand constructor.
      *
-     * @param \EE_Registration $old_registration
-     * @param \EE_Ticket       $new_ticket
+     * @param EE_Registration $old_registration
+     * @param EE_Ticket       $new_ticket
+     * @param bool            $trigger_notifications
      */
     public function __construct(
-        \EE_Registration $old_registration,
-        \EE_Ticket $new_ticket
+        EE_Registration $old_registration,
+        EE_Ticket $new_ticket,
+        $trigger_notifications
     ) {
         $this->registration = $old_registration;
         $this->ticket = $new_ticket;
+        $this->trigger_notifications = filter_var($trigger_notifications, FILTER_VALIDATE_BOOLEAN);
     }
 
 
 
     /**
-     * @return \EventEspresso\core\domain\services\capabilities\CapCheck
+     * @return CapCheck
+     * @throws EE_Error
+     * @throws InvalidDataTypeException
      */
     public function getCapCheck()
     {
         return new CapCheck(
-            'ee_edit_registration',
+            'ee_edit_registrations',
             __('Edit Registration Ticket Selection', 'event_espresso'),
             $this->registration->ID()
         );
@@ -67,7 +79,7 @@ class MoveAttendeeCommand extends Command implements CommandRequiresCapCheckInte
 
 
     /**
-     * @return \EE_Registration
+     * @return EE_Registration
      */
     public function registration()
     {
@@ -77,11 +89,21 @@ class MoveAttendeeCommand extends Command implements CommandRequiresCapCheckInte
 
 
     /**
-     * @return \EE_Ticket
+     * @return EE_Ticket
      */
     public function ticket()
     {
         return $this->ticket;
+    }
+
+
+
+    /**
+     * @return bool
+     */
+    public function triggerNotifications()
+    {
+        return $this->trigger_notifications;
     }
 
 
