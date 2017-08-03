@@ -53,6 +53,10 @@ abstract class Step extends SequentialStepForm
      */
     protected $current_ticket;
 
+    /**
+     * @var bool $notify
+     */
+    protected $notify;
 
 
     /**
@@ -92,11 +96,13 @@ abstract class Step extends SequentialStepForm
         $this->REG_ID = $this->getRegId();
         $this->EVT_ID = $this->getEventId();
         $this->TKT_ID = $this->getTicketId();
+        $this->notify = $this->getNotify();
         $this->addRedirectArgs(
             array(
                 '_REG_ID' => $this->REG_ID,
                 'EVT_ID'  => $this->EVT_ID,
                 'TKT_ID'  => $this->TKT_ID,
+                'ee-notify' => $this->notify,
             )
         );
         $this->addFormActionArgs(
@@ -104,6 +110,7 @@ abstract class Step extends SequentialStepForm
                 '_REG_ID' => $this->REG_ID,
                 'EVT_ID'  => $this->EVT_ID,
                 'TKT_ID'  => $this->TKT_ID,
+                'ee-notify' => $this->notify,
             )
         );
     }
@@ -212,6 +219,39 @@ abstract class Step extends SequentialStepForm
         return $this->current_ticket;
     }
 
+
+
+    /**
+     * @return bool
+     */
+    public function notify()
+    {
+        return $this->notify;
+    }
+
+
+
+    /**
+     * @return bool
+     * @throws ReflectionException
+     * @throws EE_Error
+     */
+    public function getNotify()
+    {
+        $request = $this->registry->load_core('Request');
+        $this->setNotify($request->get('ee-notify', false));
+        return $this->notify;
+    }
+
+
+
+    /**
+     * @param bool $notify
+     */
+    public function setNotify($notify = true)
+    {
+        $this->notify = filter_var($notify, FILTER_VALIDATE_BOOLEAN);
+    }
 
 
     /**
