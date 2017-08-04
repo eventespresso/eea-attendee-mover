@@ -70,7 +70,7 @@ class MoveAttendeeCommand extends Command implements CommandRequiresCapCheckInte
     public function getCapCheck()
     {
         return new CapCheck(
-            'ee_edit_registrations',
+            'ee_edit_registration',
             __('Edit Registration Ticket Selection', 'event_espresso'),
             $this->registration->ID()
         );
