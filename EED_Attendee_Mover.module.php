@@ -176,7 +176,7 @@ class EED_Attendee_Mover extends EED_Module
             : 0;
         $page_routes['edit_attendee_selections'] = array(
             'func'       => array('EED_Attendee_Mover', 'edit_attendee_selections'),
-            'capability' => 'ee_edit_registrations',
+            'capability' => 'ee_edit_registration',
             'obj_id'     => $REG_ID,
             '_REG_ID'    => $REG_ID,
             'EVT_ID'     => $EVT_ID,
@@ -185,7 +185,8 @@ class EED_Attendee_Mover extends EED_Module
         $page_routes['process_attendee_selections'] = array(
             'func'       => array('EED_Attendee_Mover', 'process_attendee_selections'),
             'args'       => array($admin_page),
-            'capability' => 'ee_edit_registrations',
+            'capability' => 'ee_edit_registration',
+            'obj_id'     => $REG_ID,
             '_REG_ID'    => $REG_ID,
             'EVT_ID'     => $EVT_ID,
             'TKT_ID'     => $TKT_ID,
@@ -295,8 +296,9 @@ class EED_Attendee_Mover extends EED_Module
         if (
             $REG_ID === 0
             || ! EE_Registry::instance()->CAP->current_user_can(
-                'ee_edit_registrations',
-                'espresso_registrations_change_event_or_ticket'
+                'ee_edit_registration',
+                'espresso_registrations_change_event_or_ticket',
+                $REG_ID
             )
         ) {
             return '';
