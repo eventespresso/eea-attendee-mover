@@ -74,12 +74,12 @@ function EE_Attendee_Mover_Event_Select2( data_interface_args ) {
 					secs = Date.parse( data[i].datetimes[j].DTT_EVT_start );
 					// start date
 					start_date        = moment( new Date( secs ) );
-					start_date_string = start_date.format( "MMM YYYY" );
+					start_date_string = start_date.format( "MMM DD YYYY" );
 					preferred_datetime_text += start_date_string;
 					// end date
 					secs     = Date.parse( data[ i ].datetimes[ j ].DTT_EVT_end );
 					end_date        = moment( new Date( secs ) );
-					end_date_string = end_date.format( "MMM YYYY" );
+					end_date_string = end_date.format( "MMM DD YYYY" );
 					if ( end_date_string !== start_date_string ) {
 						preferred_datetime_text += ' - ' + end_date_string;
 					}
