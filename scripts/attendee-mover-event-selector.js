@@ -94,7 +94,7 @@ function EE_Attendee_Mover_Event_Select2( data_interface_args ) {
 			formatted_results.push(
 				{
 					id: data[i]['EVT_ID'],
-					text: ' ' + data[i]['EVT_ID'] + ' ) ' + data[i]['EVT_name'] + ' : ' + preferred_datetime_text
+					text: '#' + data[i]['EVT_ID'] + ' | ' + data[i]['EVT_name'] + ' : ' + preferred_datetime_text
 				}
 			);
 		}
