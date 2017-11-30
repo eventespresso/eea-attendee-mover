@@ -122,10 +122,10 @@ class MoveAttendeeCommandHandler extends CommandHandler
             $old_registration->count(),
             $old_registration->group_size()
         );
-        // move/copy over additional data from old registration, like reg form question answers
-        $this->copy_registration_service->copyRegistrationDetails($new_registration, $old_registration);
-        // and registration payments
+        // move/copy over registration payments
         $this->copy_registration_service->copyPaymentDetails($new_registration, $old_registration);
+        // and additional data from old registration, like reg form question answers
+        $this->copy_registration_service->copyRegistrationDetails($new_registration, $old_registration);
         // now cancel original registration and it's ticket line item
         $this->cancel_registration_service->cancelRegistrationAndTicketLineItem($old_registration, false);
         // bamboozle EED_Messages into sending notifications by tweaking the request vars
