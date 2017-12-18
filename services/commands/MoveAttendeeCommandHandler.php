@@ -128,6 +128,11 @@ class MoveAttendeeCommandHandler extends CommandHandler
         $this->copy_registration_service->copyRegistrationDetails($new_registration, $old_registration);
         // now cancel original registration and it's ticket line item
         $this->cancel_registration_service->cancelRegistrationAndTicketLineItem($old_registration, false);
+        // manually increment ticket sold count for new ticket if registration is approved
+        if ($new_registration->is_approved()) {
+            $new_ticket->increase_sold();
+            $new_ticket->save();
+        }
         // bamboozle EED_Messages into sending notifications by tweaking the request vars
         $_REQUEST['txn_reg_status_change']['send_notifications'] = (int)$command->triggerNotifications();
         // perform final status updates and trigger notifications
