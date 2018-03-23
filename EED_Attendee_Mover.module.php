@@ -2,12 +2,8 @@
 
 use EventEspresso\AttendeeMover\form\StepsManager;
 use EventEspresso\core\exceptions\ExceptionStackTraceDisplay;
-use EventEspresso\core\exceptions\InvalidClassException;
 use EventEspresso\core\exceptions\InvalidDataTypeException;
-use EventEspresso\core\exceptions\InvalidEntityException;
-use EventEspresso\core\exceptions\InvalidIdentifierException;
 use EventEspresso\core\exceptions\InvalidInterfaceException;
-use EventEspresso\core\libraries\form_sections\form_handlers\FormHandler;
 use EventEspresso\core\services\loaders\LoaderFactory;
 
 defined('EVENT_ESPRESSO_VERSION') || exit('No direct script access allowed');
@@ -206,15 +202,18 @@ class EED_Attendee_Mover extends EED_Module
     }
 
 
-
     /**
      * @param array           $actions
      * @param EE_Registration $registration
      * @return array
+     * @throws \ReflectionException
+     * @throws \EventEspresso\core\exceptions\InvalidInterfaceException
+     * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
      * @throws InvalidArgumentException
      * @throws EE_Error
      */
-    public static function edit_attendee_selections_button_reg_list($actions = array(), EE_Registration $registration)
+    public static function edit_attendee_selections_button_reg_list(array $actions = array(), EE_Registration
+    $registration)
     {
         if (
         ! in_array(
@@ -238,12 +237,13 @@ class EED_Attendee_Mover extends EED_Module
     }
 
 
-
     /**
      * @param int  $REG_ID
      * @param bool $button
      * @param bool $echo
      * @return string
+     * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
+     * @throws \EventEspresso\core\exceptions\InvalidInterfaceException
      * @throws InvalidArgumentException
      */
     public static function edit_attendee_selections_button($REG_ID = 0, $button = true, $echo = true)
@@ -314,7 +314,7 @@ class EED_Attendee_Mover extends EED_Module
     public static function get_edit_attendee_selections_url($REG_ID = 0, $process = false)
     {
         $REG_ID = absint($REG_ID);
-        if (! $REG_ID > 0) {
+        if (! $REG_ID) {
             throw new InvalidArgumentException(
                 esc_html__('The Registration ID must be a positive integer.', 'event_espresso')
             );
@@ -331,9 +331,12 @@ class EED_Attendee_Mover extends EED_Module
     }
 
 
-
     /**
      * @param $REG_ID
+     * @throws \ReflectionException
+     * @throws \InvalidArgumentException
+     * @throws \EventEspresso\core\exceptions\InvalidInterfaceException
+     * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
      * @throws EE_Error
      */
     public static function registration_moved_notice($REG_ID)
@@ -407,12 +410,13 @@ class EED_Attendee_Mover extends EED_Module
     }
 
 
-
+    /**
+     * @throws Exception
+     */
     public static function edit_attendee_selections_init()
     {
         EED_Attendee_Mover::instance()->_edit_attendee_selections_init();
     }
-
 
 
     /**
@@ -420,12 +424,6 @@ class EED_Attendee_Mover extends EED_Module
      *
      * @return void
      * @throws Exception
-     * @throws InvalidInterfaceException
-     * @throws InvalidIdentifierException
-     * @throws InvalidEntityException
-     * @throws InvalidClassException
-     * @throws InvalidArgumentException
-     * @throws InvalidDataTypeException
      */
     protected function _edit_attendee_selections_init()
     {
@@ -439,9 +437,11 @@ class EED_Attendee_Mover extends EED_Module
     }
 
 
-
     /**
      * callback that displays the page template
+     *
+     * @throws \EE_Error
+     * @throws \DomainException
      */
     public static function edit_attendee_selections()
     {
@@ -455,8 +455,6 @@ class EED_Attendee_Mover extends EED_Module
      * callback that adds the main "edit_attendee_selections" meta_box
      * calls non static method below
      *
-     * @throws InvalidDataTypeException
-     * @throws InvalidArgumentException
      * @throws Exception
      */
     public static function edit_attendee_selections_meta_box()
@@ -465,10 +463,7 @@ class EED_Attendee_Mover extends EED_Module
     }
 
 
-
     /**
-     * @throws InvalidDataTypeException
-     * @throws InvalidArgumentException
      * @throws Exception
      */
     public function _edit_attendee_selections_meta_box()
@@ -490,12 +485,6 @@ class EED_Attendee_Mover extends EED_Module
      *
      * @param Registrations_Admin_Page $admin_page
      * @throws Exception
-     * @throws InvalidClassException
-     * @throws InvalidDataTypeException
-     * @throws InvalidEntityException
-     * @throws InvalidIdentifierException
-     * @throws InvalidInterfaceException
-     * @throws InvalidArgumentException
      */
     public static function process_attendee_selections(Registrations_Admin_Page $admin_page)
     {
@@ -503,17 +492,10 @@ class EED_Attendee_Mover extends EED_Module
     }
 
 
-
     /**
      * callback route for when the attendee mover step forms are being processed
      *
      * @param  Registrations_Admin_Page $admin_page
-     * @throws InvalidClassException
-     * @throws InvalidInterfaceException
-     * @throws InvalidDataTypeException
-     * @throws InvalidEntityException
-     * @throws InvalidIdentifierException
-     * @throws InvalidArgumentException
      * @throws Exception
      */
     protected function _process_attendee_selections(Registrations_Admin_Page $admin_page)
