@@ -2,12 +2,9 @@
 
 use EventEspresso\AttendeeMover\form\StepsManager;
 use EventEspresso\core\exceptions\ExceptionStackTraceDisplay;
-use EventEspresso\core\exceptions\InvalidClassException;
 use EventEspresso\core\exceptions\InvalidDataTypeException;
-use EventEspresso\core\exceptions\InvalidEntityException;
-use EventEspresso\core\exceptions\InvalidIdentifierException;
 use EventEspresso\core\exceptions\InvalidInterfaceException;
-use EventEspresso\core\libraries\form_sections\form_handlers\FormHandler;
+use EventEspresso\core\services\loaders\LoaderFactory;
 
 defined('EVENT_ESPRESSO_VERSION') || exit('No direct script access allowed');
 
@@ -47,7 +44,6 @@ class EED_Attendee_Mover extends EED_Module
      */
     public static function set_hooks()
     {
-        EED_Attendee_Mover::register_namespace_and_dependencies();
     }
 
 
@@ -59,7 +55,6 @@ class EED_Attendee_Mover extends EED_Module
      */
     public static function set_hooks_admin()
     {
-        EED_Attendee_Mover::register_namespace_and_dependencies();
         add_action(
             'FHEE__EE_Admin_Page___load_page_dependencies__after_load__espresso_registrations__edit_attendee_selections',
             array('EED_Attendee_Mover', 'edit_attendee_selections_init')
@@ -94,50 +89,6 @@ class EED_Attendee_Mover extends EED_Module
             array('EED_Attendee_Mover', 'reg_admin_list_legend'),
             10, 1
         );
-    }
-
-
-
-    /**
-     * register_namespace_and_dependencies
-     */
-    public static function register_namespace_and_dependencies()
-    {
-        EE_Psr4AutoloaderInit::psr4_loader()->addNamespace('EventEspresso\AttendeeMover', __DIR__);
-        $attendee_mover_dependencies = array(
-            'EventEspresso\AttendeeMover\form\SelectEvent'                             => array(
-                'EE_Registry' => EE_Dependency_Map::load_from_cache,
-            ),
-            'EventEspresso\AttendeeMover\form\SelectTicket'                            => array(
-                'EE_Registry' => EE_Dependency_Map::load_from_cache,
-            ),
-            'EventEspresso\AttendeeMover\form\VerifyChanges'                           => array(
-                'EE_Registry' => EE_Dependency_Map::load_from_cache,
-            ),
-            'EventEspresso\AttendeeMover\form\Complete'                                => array(
-                'EE_Registry' => EE_Dependency_Map::load_from_cache,
-            ),
-            'EventEspresso\AttendeeMover\services\commands\MoveAttendeeCommandHandler' => array(
-                'EventEspresso\core\domain\services\ticket\CreateTicketLineItemService'     => EE_Dependency_Map::load_from_cache,
-                'EventEspresso\core\domain\services\registration\CreateRegistrationService' => EE_Dependency_Map::load_from_cache,
-                'EventEspresso\core\domain\services\registration\CopyRegistrationService'   => EE_Dependency_Map::load_from_cache,
-                'EventEspresso\core\domain\services\registration\CancelRegistrationService' => EE_Dependency_Map::load_from_cache,
-                'EventEspresso\core\domain\services\registration\UpdateRegistrationService' => EE_Dependency_Map::load_from_cache,
-            ),
-        );
-        foreach ($attendee_mover_dependencies as $class => $dependencies) {
-            if (! EE_Dependency_Map::register_dependencies($class, $dependencies)) {
-                EE_Error::add_error(
-                    sprintf(
-                        esc_html__('Could not register dependencies for "%1$s"', 'event_espresso'),
-                        $class
-                    ),
-                    __FILE__,
-                    __FUNCTION__,
-                    __LINE__
-                );
-            }
-        }
     }
 
 
@@ -251,15 +202,18 @@ class EED_Attendee_Mover extends EED_Module
     }
 
 
-
     /**
      * @param array           $actions
      * @param EE_Registration $registration
      * @return array
+     * @throws \ReflectionException
+     * @throws \EventEspresso\core\exceptions\InvalidInterfaceException
+     * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
      * @throws InvalidArgumentException
      * @throws EE_Error
      */
-    public static function edit_attendee_selections_button_reg_list($actions = array(), EE_Registration $registration)
+    public static function edit_attendee_selections_button_reg_list(array $actions = array(), EE_Registration
+    $registration)
     {
         if (
         ! in_array(
@@ -283,12 +237,13 @@ class EED_Attendee_Mover extends EED_Module
     }
 
 
-
     /**
      * @param int  $REG_ID
      * @param bool $button
      * @param bool $echo
      * @return string
+     * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
+     * @throws \EventEspresso\core\exceptions\InvalidInterfaceException
      * @throws InvalidArgumentException
      */
     public static function edit_attendee_selections_button($REG_ID = 0, $button = true, $echo = true)
@@ -359,7 +314,7 @@ class EED_Attendee_Mover extends EED_Module
     public static function get_edit_attendee_selections_url($REG_ID = 0, $process = false)
     {
         $REG_ID = absint($REG_ID);
-        if (! $REG_ID > 0) {
+        if (! $REG_ID) {
             throw new InvalidArgumentException(
                 esc_html__('The Registration ID must be a positive integer.', 'event_espresso')
             );
@@ -376,9 +331,12 @@ class EED_Attendee_Mover extends EED_Module
     }
 
 
-
     /**
      * @param $REG_ID
+     * @throws \ReflectionException
+     * @throws \InvalidArgumentException
+     * @throws \EventEspresso\core\exceptions\InvalidInterfaceException
+     * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
      * @throws EE_Error
      */
     public static function registration_moved_notice($REG_ID)
@@ -423,46 +381,42 @@ class EED_Attendee_Mover extends EED_Module
     }
 
 
-
     /**
      * @param bool $process
      * @return StepsManager
      * @throws InvalidDataTypeException
-     * @throws EE_Error
      * @throws InvalidArgumentException
-     * @throws ReflectionException
+     * @throws InvalidInterfaceException
      */
     public function get_form_steps_manager($process = true)
     {
         static $form_steps_manager = null;
         if (! $form_steps_manager instanceof StepsManager) {
-            $request = EE_Registry::instance()->load_core('Request');
-            $REG_ID = absint($request->get('_REG_ID', 0));
-            $form_steps_manager = new StepsManager(
-            // base redirect URL
-                EED_Attendee_Mover::get_edit_attendee_selections_url($REG_ID, $process),
-                // default step slug
-                'select_event',
-                // form action
-                '',
-                // form config
-                FormHandler::ADD_FORM_TAGS_AND_SUBMIT,
-                // progress steps theme/style
-                'number_bubbles',
-                // EE_Request
-                $request
+            /** @var EventEspresso\core\services\loaders\Loader $loader */
+            $loader             = LoaderFactory::getLoader();
+            $request            = $loader->getShared('EE_Request');
+            $REG_ID             = absint($request->get('_REG_ID', 0));
+            $form_steps_manager = $loader->getShared(
+                'EventEspresso\AttendeeMover\form\StepsManager',
+                array(
+                    // base redirect URL
+                    EED_Attendee_Mover::get_edit_attendee_selections_url($REG_ID, $process),
+                    // default step slug
+                    'select_event',
+                )
             );
         }
         return $form_steps_manager;
     }
 
 
-
+    /**
+     * @throws Exception
+     */
     public static function edit_attendee_selections_init()
     {
         EED_Attendee_Mover::instance()->_edit_attendee_selections_init();
     }
-
 
 
     /**
@@ -470,12 +424,6 @@ class EED_Attendee_Mover extends EED_Module
      *
      * @return void
      * @throws Exception
-     * @throws InvalidInterfaceException
-     * @throws InvalidIdentifierException
-     * @throws InvalidEntityException
-     * @throws InvalidClassException
-     * @throws InvalidArgumentException
-     * @throws InvalidDataTypeException
      */
     protected function _edit_attendee_selections_init()
     {
@@ -489,9 +437,11 @@ class EED_Attendee_Mover extends EED_Module
     }
 
 
-
     /**
      * callback that displays the page template
+     *
+     * @throws \EE_Error
+     * @throws \DomainException
      */
     public static function edit_attendee_selections()
     {
@@ -505,8 +455,6 @@ class EED_Attendee_Mover extends EED_Module
      * callback that adds the main "edit_attendee_selections" meta_box
      * calls non static method below
      *
-     * @throws InvalidDataTypeException
-     * @throws InvalidArgumentException
      * @throws Exception
      */
     public static function edit_attendee_selections_meta_box()
@@ -515,10 +463,7 @@ class EED_Attendee_Mover extends EED_Module
     }
 
 
-
     /**
-     * @throws InvalidDataTypeException
-     * @throws InvalidArgumentException
      * @throws Exception
      */
     public function _edit_attendee_selections_meta_box()
@@ -540,12 +485,6 @@ class EED_Attendee_Mover extends EED_Module
      *
      * @param Registrations_Admin_Page $admin_page
      * @throws Exception
-     * @throws InvalidClassException
-     * @throws InvalidDataTypeException
-     * @throws InvalidEntityException
-     * @throws InvalidIdentifierException
-     * @throws InvalidInterfaceException
-     * @throws InvalidArgumentException
      */
     public static function process_attendee_selections(Registrations_Admin_Page $admin_page)
     {
@@ -553,17 +492,10 @@ class EED_Attendee_Mover extends EED_Module
     }
 
 
-
     /**
      * callback route for when the attendee mover step forms are being processed
      *
      * @param  Registrations_Admin_Page $admin_page
-     * @throws InvalidClassException
-     * @throws InvalidInterfaceException
-     * @throws InvalidDataTypeException
-     * @throws InvalidEntityException
-     * @throws InvalidIdentifierException
-     * @throws InvalidArgumentException
      * @throws Exception
      */
     protected function _process_attendee_selections(Registrations_Admin_Page $admin_page)
@@ -595,7 +527,14 @@ class EED_Attendee_Mover extends EED_Module
     }
 
 
-
+    /**
+     * @deprecated $VID:$
+     * register_namespace_and_dependencies
+     */
+    public static function register_namespace_and_dependencies()
+    {
+        // moved to \EE_Attendee_Mover::after_registration()
+    }
 }
 // End of file EED_Attendee_Mover.module.php
 // Location: /wp-content/plugins/eea-attendee-mover/EED_Attendee_Mover.module.php
