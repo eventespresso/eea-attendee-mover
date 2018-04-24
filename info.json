@@ -5,7 +5,6 @@
     "archiveBaseUrl": "http:\/\/build.eventespresso.com\/",
     "archiveBasePath": "~\/www\/build\/",
     "releaseFilesRemove": ["src\/tests\/**", "src\/info.json", "src\/circle.yml", "src\/readme.md", "src\/.travis.yml"],
-    "github": true,
     "awsbucket": "",
     "awsregion": "",
     "srcBuildFolderName": "eea-attendee-mover",
