@@ -528,7 +528,7 @@ class EED_Attendee_Mover extends EED_Module
 
 
     /**
-     * @deprecated $VID:$
+     * @deprecated 1.0.3.p
      * register_namespace_and_dependencies
      */
     public static function register_namespace_and_dependencies()
