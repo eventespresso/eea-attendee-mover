@@ -37,73 +37,81 @@
  * ------------------------------------------------------------------------
  */
 // define versions and this file
-define( 'EE_ATTENDEE_MOVER_CORE_VERSION_REQUIRED', '4.9.13.rc.006' );
-define( 'EE_ATTENDEE_MOVER_WP_VERSION_REQUIRED', '4.4.0' );
-define( 'EE_ATTENDEE_MOVER_VERSION', '1.0.4.rc.000' );
-define( 'EE_ATTENDEE_MOVER_PLUGIN_FILE',  __FILE__ );
-
-
+define('EE_ATTENDEE_MOVER_CORE_VERSION_REQUIRED', '4.9.13.rc.006');
+define('EE_ATTENDEE_MOVER_WP_VERSION_REQUIRED', '4.4.0');
+define('EE_ATTENDEE_MOVER_VERSION', '1.0.4.rc.000');
+define('EE_ATTENDEE_MOVER_PLUGIN_FILE', __FILE__);
 
 
 /**
  *    captures plugin activation errors for debugging
  */
-function espresso_attendee_mover_plugin_activation_errors() {
+function espresso_attendee_mover_plugin_activation_errors()
+{
 
-	if ( WP_DEBUG ) {
-		$activation_errors = ob_get_contents();
-		file_put_contents( EVENT_ESPRESSO_UPLOAD_DIR . 'logs' . DS . 'espresso_attendee_mover_plugin_activation_errors.html', $activation_errors );
-	}
+    if (WP_DEBUG) {
+        $activation_errors = ob_get_contents();
+        file_put_contents(
+            EVENT_ESPRESSO_UPLOAD_DIR . 'logs' . DS . 'espresso_attendee_mover_plugin_activation_errors.html',
+            $activation_errors
+        );
+    }
 }
-add_action( 'activated_plugin', 'espresso_attendee_mover_plugin_activation_errors' );
 
+add_action('activated_plugin', 'espresso_attendee_mover_plugin_activation_errors');
 
 
 /**
  *    registers addon with EE core
  */
-function load_espresso_attendee_mover() {
-	if ( class_exists( 'EE_Addon' )) {
-      // attendee_mover version
-      require_once ( plugin_dir_path( __FILE__ ) . 'EE_Attendee_Mover.class.php' );
-      EE_Attendee_Mover::register_addon();
-  } else {
-    add_action( 'admin_notices', 'espresso_attendee_mover_activation_error' );
-  }
+function load_espresso_attendee_mover()
+{
+    if (class_exists('EE_Addon')) {
+        // attendee_mover version
+        require_once(plugin_dir_path(__FILE__) . 'EE_Attendee_Mover.class.php');
+        EE_Attendee_Mover::register_addon();
+    } else {
+        add_action('admin_notices', 'espresso_attendee_mover_activation_error');
+    }
 }
-add_action( 'AHEE__EE_System__load_espresso_addons', 'load_espresso_attendee_mover' );
 
+add_action('AHEE__EE_System__load_espresso_addons', 'load_espresso_attendee_mover');
 
 
 /**
  *    verifies that addon was activated
  */
-function espresso_attendee_mover_activation_check() {
-  if ( ! did_action( 'AHEE__EE_System__load_espresso_addons' ) ) {
-    add_action( 'admin_notices', 'espresso_attendee_mover_activation_error' );
-  }
+function espresso_attendee_mover_activation_check()
+{
+    if (! did_action('AHEE__EE_System__load_espresso_addons')) {
+        add_action('admin_notices', 'espresso_attendee_mover_activation_error');
+    }
 }
-add_action( 'init', 'espresso_attendee_mover_activation_check', 1 );
 
+add_action('init', 'espresso_attendee_mover_activation_check', 1);
 
 
 /**
  *    displays activation error admin notice
  */
-function espresso_attendee_mover_activation_error() {
-  unset( $_GET[ 'activate' ],  $_REQUEST[ 'activate' ] );
-  if ( ! function_exists( 'deactivate_plugins' ) ) {
-    require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-  }
-  deactivate_plugins( plugin_basename( EE_ATTENDEE_MOVER_PLUGIN_FILE ) );
-  ?>
-  <div class="error">
-    <p><?php printf( __( 'Event Espresso Attendee Mover could not be activated. Please ensure that Event Espresso version %1$s or higher is running', 'event_espresso' ), EE_ATTENDEE_MOVER_CORE_VERSION_REQUIRED ); ?></p>
-  </div>
-<?php
+function espresso_attendee_mover_activation_error()
+{
+    unset($_GET['activate'], $_REQUEST['activate']);
+    if (! function_exists('deactivate_plugins')) {
+        require_once(ABSPATH . 'wp-admin/includes/plugin.php');
+    }
+    deactivate_plugins(plugin_basename(EE_ATTENDEE_MOVER_PLUGIN_FILE));
+    ?>
+    <div class="error">
+        <p><?php
+            printf(
+                __(
+                    'Event Espresso Attendee Mover could not be activated. Please ensure that Event Espresso version %1$s or higher is running',
+                    'event_espresso'
+                ),
+                EE_ATTENDEE_MOVER_CORE_VERSION_REQUIRED
+            );
+            ?></p>
+    </div>
+    <?php
 }
-
-
-
-// End of file eea-attendee-mover.php
-// Location: wp-content/plugins/eea-attendee-mover/eea-attendee-mover.php

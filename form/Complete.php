@@ -20,10 +20,6 @@ use OutOfRangeException;
 use ReflectionException;
 use RuntimeException;
 
-defined('EVENT_ESPRESSO_VERSION') || exit('No direct script access allowed');
-
-
-
 /**
  * Class Complete
  * final form in the sequential form steps for the Attendee Mover admin page
@@ -61,7 +57,6 @@ class Complete extends Step
     }
 
 
-
     /**
      * creates and returns the actual form
      *
@@ -83,7 +78,6 @@ class Complete extends Step
     }
 
 
-
     /**
      * normally displays the form, but we are going to skip right to processing our changes
      *
@@ -98,7 +92,6 @@ class Complete extends Step
     {
         return '';
     }
-
 
 
     /**
@@ -158,9 +151,4 @@ class Complete extends Step
         );
         return true;
     }
-
-
-
 }
-// End of file Complete.php
-// Location: /Complete.php

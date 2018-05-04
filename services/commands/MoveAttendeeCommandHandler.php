@@ -18,9 +18,6 @@ use EventEspresso\core\services\commands\CommandInterface;
 use OutOfRangeException;
 use RuntimeException;
 
-defined('EVENT_ESPRESSO_VERSION') || exit('No direct script access allowed');
-
-
 /**
  * Class MoveAttendee
  * receives a MoveAttendeeCommand object via the handle() method,
@@ -33,7 +30,6 @@ defined('EVENT_ESPRESSO_VERSION') || exit('No direct script access allowed');
  */
 class MoveAttendeeCommandHandler extends CommandHandler
 {
-
 
 
     /**
@@ -63,7 +59,6 @@ class MoveAttendeeCommandHandler extends CommandHandler
     private $update_registration_service;
 
 
-
     /**
      * Command constructor
      *
@@ -86,7 +81,6 @@ class MoveAttendeeCommandHandler extends CommandHandler
         $this->cancel_registration_service = $cancel_registration_service;
         $this->update_registration_service = $update_registration_service;
     }
-
 
 
     /**
@@ -134,14 +128,13 @@ class MoveAttendeeCommandHandler extends CommandHandler
             $new_ticket->save();
         }
         // bamboozle EED_Messages into sending notifications by tweaking the request vars
-        $_REQUEST['txn_reg_status_change']['send_notifications'] = (int)$command->triggerNotifications();
+        $_REQUEST['txn_reg_status_change']['send_notifications'] = (int) $command->triggerNotifications();
         // perform final status updates and trigger notifications
         $this->update_registration_service->updateRegistrationAndTransaction($command->registration());
         // tag registrations for identification purposes
         $this->addExtraMeta($old_registration, $new_registration, $new_ticket);
         return $new_registration;
     }
-
 
 
     /**
@@ -179,7 +172,6 @@ class MoveAttendeeCommandHandler extends CommandHandler
     }
 
 
-
     /**
      * @param EE_Registration $old_registration
      * @param EE_Registration $new_registration
@@ -202,7 +194,4 @@ class MoveAttendeeCommandHandler extends CommandHandler
             array('TKT_ID' => $new_ticket->ID(), 'OLD_REG_ID' => $old_registration->ID())
         );
     }
-
 }
-// End of file MoveAttendeeCommandHandler.php
-// Location: wp-content/plugins/eea-attendee-mover/services/commands/MoveAttendeeCommandHandler.php
