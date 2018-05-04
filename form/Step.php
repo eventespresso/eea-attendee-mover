@@ -19,9 +19,6 @@ use Exception;
 use InvalidArgumentException;
 use ReflectionException;
 
-defined('EVENT_ESPRESSO_VERSION') || exit('No direct script access allowed');
-
-
 /**
  * Class Step
  * abstract parent class for individual forms in the Attendee Mover sequential form
@@ -99,22 +96,21 @@ abstract class Step extends SequentialStepForm
         $this->notify = $this->getNotify();
         $this->addRedirectArgs(
             array(
-                '_REG_ID' => $this->REG_ID,
-                'EVT_ID'  => $this->EVT_ID,
-                'TKT_ID'  => $this->TKT_ID,
+                '_REG_ID'   => $this->REG_ID,
+                'EVT_ID'    => $this->EVT_ID,
+                'TKT_ID'    => $this->TKT_ID,
                 'ee-notify' => $this->notify,
             )
         );
         $this->addFormActionArgs(
             array(
-                '_REG_ID' => $this->REG_ID,
-                'EVT_ID'  => $this->EVT_ID,
-                'TKT_ID'  => $this->TKT_ID,
+                '_REG_ID'   => $this->REG_ID,
+                'EVT_ID'    => $this->EVT_ID,
+                'TKT_ID'    => $this->TKT_ID,
                 'ee-notify' => $this->notify,
             )
         );
     }
-
 
 
     /**
@@ -127,7 +123,6 @@ abstract class Step extends SequentialStepForm
         $request = $this->registry->load_core('Request');
         return absint($request->get('_REG_ID', 0));
     }
-
 
 
     /**
@@ -145,7 +140,6 @@ abstract class Step extends SequentialStepForm
     }
 
 
-
     /**
      * @return int
      * @throws ReflectionException
@@ -156,7 +150,6 @@ abstract class Step extends SequentialStepForm
         $request = $this->registry->load_core('Request');
         return absint($request->get('EVT_ID', 0));
     }
-
 
 
     /**
@@ -175,7 +168,6 @@ abstract class Step extends SequentialStepForm
     }
 
 
-
     /**
      * @return int
      * @throws ReflectionException
@@ -186,7 +178,6 @@ abstract class Step extends SequentialStepForm
         $request = $this->registry->load_core('Request');
         return absint($request->get('TKT_ID', 0));
     }
-
 
 
     /**
@@ -204,7 +195,6 @@ abstract class Step extends SequentialStepForm
     }
 
 
-
     /**
      * @return EE_Ticket
      * @throws EE_Error
@@ -220,7 +210,6 @@ abstract class Step extends SequentialStepForm
     }
 
 
-
     /**
      * @return bool
      */
@@ -228,7 +217,6 @@ abstract class Step extends SequentialStepForm
     {
         return $this->notify;
     }
-
 
 
     /**
@@ -242,7 +230,6 @@ abstract class Step extends SequentialStepForm
         $this->setNotify($request->get('ee-notify', false));
         return $this->notify;
     }
-
 
 
     /**
@@ -337,9 +324,4 @@ abstract class Step extends SequentialStepForm
             'eea-attendee-mover-current-reg-info-div'
         );
     }
-
-
-
 }
-// End of file Step.php
-// Location: /Step.php

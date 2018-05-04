@@ -10,9 +10,6 @@ use EventEspresso\core\exceptions\InvalidDataTypeException;
 use EventEspresso\core\services\commands\Command;
 use EventEspresso\core\services\commands\CommandRequiresCapCheckInterface;
 
-defined('EVENT_ESPRESSO_VERSION') || exit('No direct script access allowed');
-
-
 /**
  * Class MoveAttendeeCommand
  * Primarily a DTO (Data Transfer Object)
@@ -42,7 +39,6 @@ class MoveAttendeeCommand extends Command implements CommandRequiresCapCheckInte
     protected $trigger_notifications;
 
 
-
     /**
      * MoveAttendeeCommand constructor.
      *
@@ -61,7 +57,6 @@ class MoveAttendeeCommand extends Command implements CommandRequiresCapCheckInte
     }
 
 
-
     /**
      * @return CapCheck
      * @throws EE_Error
@@ -77,7 +72,6 @@ class MoveAttendeeCommand extends Command implements CommandRequiresCapCheckInte
     }
 
 
-
     /**
      * @return EE_Registration
      */
@@ -85,7 +79,6 @@ class MoveAttendeeCommand extends Command implements CommandRequiresCapCheckInte
     {
         return $this->registration;
     }
-
 
 
     /**
@@ -97,7 +90,6 @@ class MoveAttendeeCommand extends Command implements CommandRequiresCapCheckInte
     }
 
 
-
     /**
      * @return bool
      */
@@ -105,9 +97,4 @@ class MoveAttendeeCommand extends Command implements CommandRequiresCapCheckInte
     {
         return $this->trigger_notifications;
     }
-
-
-
 }
-// End of file MoveAttendeeCommand.php
-// Location: wp-content/plugins/eea-attendee-mover/services/commands/MoveAttendeeCommand.php

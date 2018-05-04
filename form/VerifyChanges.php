@@ -1,5 +1,4 @@
 <?php
-
 namespace EventEspresso\AttendeeMover\form;
 
 use DomainException;
@@ -16,10 +15,6 @@ use EventEspresso\core\exceptions\InvalidDataTypeException;
 use InvalidArgumentException;
 use LogicException;
 use ReflectionException;
-
-defined('EVENT_ESPRESSO_VERSION') || exit('No direct script access allowed');
-
-
 
 /**
  * Class VerifyChanges
@@ -54,7 +49,6 @@ class VerifyChanges extends Step
             $registry
         );
     }
-
 
 
     /**
@@ -102,7 +96,7 @@ class VerifyChanges extends Step
                             \EEH_HTML::table(
                                 \EEH_HTML::thead(
                                     \EEH_HTML::tr(
-                                    // \EEH_HTML::th( $th1 ) .
+                                        // \EEH_HTML::th( $th1 ) .
                                         \EEH_HTML::th($th2) .
                                         \EEH_HTML::th($th3) .
                                         \EEH_HTML::th($th4) .
@@ -187,7 +181,6 @@ class VerifyChanges extends Step
     }
 
 
-
     /**
      * handles processing the form submission
      * returns true or false depending on whether the form was processed successfully or not
@@ -203,17 +196,15 @@ class VerifyChanges extends Step
      */
     public function process($form_data = array())
     {
-        $valid_data = (array)parent::process($form_data);
+        $valid_data = (array) parent::process($form_data);
         if (empty($valid_data)) {
             return false;
         }
         // check that it was the submit button that was clicked and not the cancel button
-        if (
-            ! (
-                isset($valid_data['verify_changes-submit-btn'])
-                && $valid_data['verify_changes-submit-btn'] === $this->submitBtnText()
-            )
-        ) {
+        if (! (
+            isset($valid_data['verify_changes-submit-btn'])
+            && $valid_data['verify_changes-submit-btn'] === $this->submitBtnText()
+        )) {
             EE_Error::add_attention(
                 esc_html__('Registration changes have been cancelled.', 'event_espresso')
             );
@@ -229,8 +220,7 @@ class VerifyChanges extends Step
             );
             exit();
         }
-        if (
-            isset($valid_data['notifications'], $valid_data['notifications']['trigger_send'])
+        if (isset($valid_data['notifications'], $valid_data['notifications']['trigger_send'])
             && $valid_data['notifications']['trigger_send'] === true
         ) {
             // send out notifications
@@ -243,9 +233,4 @@ class VerifyChanges extends Step
         $this->setRedirectTo(SequentialStepForm::REDIRECT_TO_NEXT_STEP);
         return true;
     }
-
-
-
 }
-// End of file VerifyChanges.php
-// Location: /VerifyChanges.php
