@@ -6,9 +6,6 @@ use EventEspresso\core\exceptions\InvalidDataTypeException;
 use EventEspresso\core\exceptions\InvalidInterfaceException;
 use EventEspresso\core\services\loaders\LoaderFactory;
 
-defined('EVENT_ESPRESSO_VERSION') || exit('No direct script access allowed');
-
-
 /**
  * Class  EED_Attendee_Mover
  *
@@ -62,32 +59,38 @@ class EED_Attendee_Mover extends EED_Module
         add_filter(
             'FHEE__EE_Registrations_List_Table__column_actions__actions',
             array('EED_Attendee_Mover', 'edit_attendee_selections_button_reg_list'),
-            10, 2
+            10,
+            2
         );
         add_action(
             'AHEE__reg_admin_details_main_meta_box_reg_details__top',
             array('EED_Attendee_Mover', 'edit_attendee_selections_button'),
-            10, 1
+            10,
+            1
         );
         add_action(
             'AHEE__reg_status_change_buttons__after_header',
             array('EED_Attendee_Mover', 'registration_moved_notice'),
-            10, 1
+            10,
+            1
         );
         add_filter(
             'FHEE__Extend_Registrations_Admin_Page__page_setup__page_routes',
             array('EED_Attendee_Mover', 'attendee_mover_page_routes'),
-            10, 2
+            10,
+            2
         );
         add_filter(
             'FHEE__Extend_Registrations_Admin_Page__page_setup__page_config',
             array('EED_Attendee_Mover', 'attendee_mover_page_config'),
-            10, 2
+            10,
+            2
         );
         add_filter(
             'FHEE__EE_Admin_Page___display_legend__items',
             array('EED_Attendee_Mover', 'reg_admin_list_legend'),
-            10, 1
+            10,
+            1
         );
     }
 
@@ -215,8 +218,7 @@ class EED_Attendee_Mover extends EED_Module
     public static function edit_attendee_selections_button_reg_list(array $actions = array(), EE_Registration
     $registration)
     {
-        if (
-        ! in_array(
+        if (! in_array(
             $registration->status_ID(),
             array(
                 EEM_Registration::status_id_cancelled,
@@ -248,8 +250,7 @@ class EED_Attendee_Mover extends EED_Module
      */
     public static function edit_attendee_selections_button($REG_ID = 0, $button = true, $echo = true)
     {
-        if (
-            $REG_ID === 0
+        if ($REG_ID === 0
             || ! EE_Registry::instance()->CAP->current_user_can(
                 'ee_edit_registration',
                 'espresso_registrations_change_event_or_ticket',
@@ -260,11 +261,11 @@ class EED_Attendee_Mover extends EED_Module
         }
         $url = EED_Attendee_Mover::get_edit_attendee_selections_url($REG_ID);
         if ($button) {
-            $link_text = $link_label = esc_html__(' Change Event/Ticket Selection');
+            $link_text = $link_label = esc_html__(' Change Event/Ticket Selection', 'event_espresso');
             $link_class = 'button secondary-button right';
         } else {
             $link_text = '';
-            $link_label = esc_html__(' Change Event/Ticket Selection');
+            $link_label = esc_html__(' Change Event/Ticket Selection', 'event_espresso');
             $link_class = 'right';
         }
         $html = EEH_Template::get_button_or_link(
@@ -361,11 +362,11 @@ class EED_Attendee_Mover extends EED_Module
         );
         foreach ($reg_moved_meta as $to_or_from => $reg_meta) {
             $reg_moved = $registration->get_extra_meta($to_or_from, true, array());
-            if (isset($reg_meta['meta_key'], $reg_moved[$reg_meta['meta_key']], $reg_meta['message'])) {
+            if (isset($reg_meta['meta_key'], $reg_moved[ $reg_meta['meta_key'] ], $reg_meta['message'])) {
                 $reg_details_url = add_query_arg(
                     array(
                         'action'  => 'view_registration',
-                        '_REG_ID' => $reg_moved[$reg_meta['meta_key']],
+                        '_REG_ID' => $reg_moved[ $reg_meta['meta_key'] ],
                     ),
                     REG_ADMIN_URL
                 );
@@ -536,5 +537,3 @@ class EED_Attendee_Mover extends EED_Module
         // moved to \EE_Attendee_Mover::after_registration()
     }
 }
-// End of file EED_Attendee_Mover.module.php
-// Location: /wp-content/plugins/eea-attendee-mover/EED_Attendee_Mover.module.php
