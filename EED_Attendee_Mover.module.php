@@ -290,17 +290,20 @@ class EED_Attendee_Mover extends EED_Module
      */
     public static function reg_admin_list_legend(array $items)
     {
-        // insert attendee_mover icon before the "approved_status" icon
-        $items = EEH_Array::insert_into_array(
-            $items,
-            array(
-                'attendee_mover' => array(
-                    'class' => 'dashicons dashicons-controls-repeat',
-                    'desc'  => esc_html__('Change Event/Ticket Selection', 'event_espresso'),
+        $screen = get_current_screen();
+        if ($screen instanceof WP_Screen && $screen->id === 'event-espresso_page_espresso_registrations') {
+            // insert attendee_mover icon before the "approved_status" icon
+            $items = EEH_Array::insert_into_array(
+                $items,
+                array(
+                    'attendee_mover' => array(
+                        'class' => 'dashicons dashicons-controls-repeat',
+                        'desc'  => esc_html__('Change Event/Ticket Selection', 'event_espresso'),
+                    ),
                 ),
-            ),
-            'approved_status'
-        );
+                'approved_status'
+            );
+        }
         return $items;
     }
 
