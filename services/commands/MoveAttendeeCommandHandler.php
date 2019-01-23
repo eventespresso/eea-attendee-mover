@@ -11,11 +11,15 @@ use EventEspresso\core\domain\services\registration\CreateRegistrationService;
 use EventEspresso\core\domain\services\registration\UpdateRegistrationService;
 use EventEspresso\core\domain\services\ticket\CreateTicketLineItemService;
 use EventEspresso\core\exceptions\EntityNotFoundException;
+use EventEspresso\core\exceptions\InvalidDataTypeException;
 use EventEspresso\core\exceptions\InvalidEntityException;
+use EventEspresso\core\exceptions\InvalidInterfaceException;
 use EventEspresso\core\exceptions\UnexpectedEntityException;
 use EventEspresso\core\services\commands\CommandHandler;
 use EventEspresso\core\services\commands\CommandInterface;
+use InvalidArgumentException;
 use OutOfRangeException;
+use ReflectionException;
 use RuntimeException;
 
 /**
@@ -86,12 +90,16 @@ class MoveAttendeeCommandHandler extends CommandHandler
     /**
      * @param CommandInterface $command
      * @return mixed
-     * @throws RuntimeException
-     * @throws EntityNotFoundException
-     * @throws UnexpectedEntityException
-     * @throws OutOfRangeException
-     * @throws InvalidEntityException
      * @throws EE_Error
+     * @throws EntityNotFoundException
+     * @throws InvalidEntityException
+     * @throws OutOfRangeException
+     * @throws RuntimeException
+     * @throws UnexpectedEntityException
+     * @throws InvalidDataTypeException
+     * @throws InvalidInterfaceException
+     * @throws InvalidArgumentException
+     * @throws ReflectionException
      */
     public function handle(CommandInterface $command)
     {
@@ -130,7 +138,7 @@ class MoveAttendeeCommandHandler extends CommandHandler
         // bamboozle EED_Messages into sending notifications by tweaking the request vars
         $_REQUEST['txn_reg_status_change']['send_notifications'] = (int) $command->triggerNotifications();
         // perform final status updates and trigger notifications
-        $this->update_registration_service->updateRegistrationAndTransaction($command->registration());
+        $this->update_registration_service->updateRegistrationAndTransaction($old_registration);
         // tag registrations for identification purposes
         $this->addExtraMeta($old_registration, $new_registration, $new_ticket);
         return $new_registration;
@@ -141,8 +149,12 @@ class MoveAttendeeCommandHandler extends CommandHandler
      * @param EE_Registration $registration
      * @param EE_Ticket       $new_ticket
      * @return void
-     * @throws RuntimeException
      * @throws EE_Error
+     * @throws RuntimeException
+     * @throws InvalidDataTypeException
+     * @throws InvalidInterfaceException
+     * @throws InvalidArgumentException
+     * @throws ReflectionException
      */
     protected function checkIfRegistrationChangeAlreadyProcessed(
         EE_Registration $registration,
@@ -177,21 +189,39 @@ class MoveAttendeeCommandHandler extends CommandHandler
      * @param EE_Registration $new_registration
      * @param EE_Ticket       $new_ticket
      * @throws EE_Error
+     * @throws InvalidDataTypeException
+     * @throws InvalidInterfaceException
+     * @throws InvalidArgumentException
+     * @throws ReflectionException
      */
     protected function addExtraMeta(
         EE_Registration $old_registration,
         EE_Registration $new_registration,
         EE_Ticket $new_ticket
     ) {
+        $current_user = wp_get_current_user();
+        $moved_by = $current_user->ID
+            ? $current_user->display_name
+            : 'unauthed user';
         // tag the old registration as moved
         $old_registration->add_extra_meta(
             'registration-moved-to',
-            array('TKT_ID' => $new_ticket->ID(), 'NEW_REG_ID' => $new_registration->ID())
+            array(
+                'TKT_ID' => $new_ticket->ID(),
+                'NEW_REG_ID' => $new_registration->ID(),
+                'moved-by' => $moved_by,
+                'timestamp' => time(),
+            )
         );
         // and the new registration as well
         $new_registration->add_extra_meta(
             'registration-moved-from',
-            array('TKT_ID' => $new_ticket->ID(), 'OLD_REG_ID' => $old_registration->ID())
+            array(
+                'TKT_ID' => $new_ticket->ID(),
+                'OLD_REG_ID' => $old_registration->ID(),
+                'moved-by' => $moved_by,
+                'timestamp' => time(),
+            )
         );
     }
 }
