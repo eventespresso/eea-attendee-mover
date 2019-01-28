@@ -81,6 +81,7 @@ class SelectEvent extends Step
                                     ),
                                     'limit' => 10,
                                     'caps'  => \EEM_Base::caps_read_admin,
+                                    'order_by' => array('Datetime.DTT_EVT_end' => 'DESC')
                                 ),
                                 'required'           => true,
                                 'select2_args'       => array(
