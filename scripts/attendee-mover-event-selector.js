@@ -5,7 +5,7 @@
  */
 function EE_Attendee_Mover_Event_Select2( data_interface_args ) {
 	this.default_query_params = data_interface_args.default_query_params || {};
-	this.items_per_page = parseInt( this.default_query_params.limit ) || 10;
+	this.items_per_page = parseInt( this.default_query_params.limit, 10 ) || 10;
 	this.nonce = data_interface_args.nonce;
 	this.locale = data_interface_args.locale;
 	this.now = moment();
@@ -107,8 +107,8 @@ function EE_Attendee_Mover_Event_Select2( data_interface_args ) {
 							end_date.format( 'MMM DD YYYY' );
 					}
 					if (
-						parseInt( event_date.DTT_reg_limit, )
-						<= parseInt( event_date.DTT_sold, )
+						parseInt( event_date.DTT_reg_limit, 10 )
+						<= parseInt( event_date.DTT_sold, 10 )
 					) {
 						datetime_details += ' •• ' + this.sold_out_notice;
 					}
