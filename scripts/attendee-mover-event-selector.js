@@ -5,12 +5,13 @@
  */
 function EE_Attendee_Mover_Event_Select2( data_interface_args ) {
 	this.default_query_params = data_interface_args.default_query_params || {};
-	this.items_per_page = this.default_query_params.limit || 10;
+	this.items_per_page = parseInt( this.default_query_params.limit ) || 10;
 	this.nonce = data_interface_args.nonce;
 	this.locale = data_interface_args.locale;
 	this.now = moment();
 	this.ISO_8601 = moment.ISO_8601;
-	this.sold_out_notice = eei18n.attendee_mover_sold_out_datetime;;
+	this.sold_out_notice = eei18n.attendee_mover_sold_out_datetime;
+	;
 
 	/**
 	 * Changes the request params set by select2 and prepares them for an EE4
@@ -102,19 +103,15 @@ function EE_Attendee_Mover_Event_Select2( data_interface_args ) {
 					}
 					datetime_details += start_date.format( 'MMM DD YYYY' );
 					if ( start_date.diff( end_date, 'seconds' ) !== 0 ) {
-						datetime_details += ' - ' + end_date.format(
-							'MMM DD YYYY' );
+						datetime_details += ' - ' +
+							end_date.format( 'MMM DD YYYY' );
 					}
 					if (
-						parseInt(
-							event_date.DTT_reg_limit
-						) <= parseInt(
-							event_date.DTT_sold
-						)
+						parseInt( event_date.DTT_reg_limit, )
+						<= parseInt( event_date.DTT_sold, )
 					) {
 						datetime_details += ' •• ' + this.sold_out_notice;
 					}
-
 				}
 			}
 			option_text = '# ' + event.EVT_ID + ' •• ';
@@ -127,7 +124,6 @@ function EE_Attendee_Mover_Event_Select2( data_interface_args ) {
 			);
 		}
 		params.page = params.page || 1;
-
 		return {
 			results: formatted_results,
 			pagination: {
