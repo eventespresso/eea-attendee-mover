@@ -5,30 +5,37 @@
  */
 function EE_Attendee_Mover_Event_Select2( data_interface_args ) {
 	this.default_query_params = data_interface_args.default_query_params || {};
-	this.items_per_page = this.default_query_params.limit || 10;
+	this.items_per_page = parseInt( this.default_query_params.limit, 10 ) || 10;
 	this.nonce = data_interface_args.nonce;
 	this.locale = data_interface_args.locale;
+	this.now = moment();
+	this.ISO_8601 = moment.ISO_8601;
+	this.sold_out_notice = eei18n.attendee_mover_sold_out_datetime;
+	;
 
 	/**
-	 * Changes the request params set by select2 and prepares them for an EE4 REST request
+	 * Changes the request params set by select2 and prepares them for an EE4
+	 * REST request
 	 * @param {object} params
 	 * @returns object
 	 */
-	this.prepData = function ( params ) {
+	this.prepData = function( params ) {
 		params.page = params.page || 1;
-		var new_params =  this.default_query_params;
+		var new_params = this.default_query_params;
 		new_params.limit = [
 			( params.page - 1 ) * this.items_per_page,
-			this.items_per_page
+			this.items_per_page,
 		];
-		if( typeof new_params.where === 'undefined' ) {
+		if ( typeof new_params.where === 'undefined' ) {
 			new_params.where = {};
 		}
 		var search_term = params.term || '';
-		new_params.where.EVT_name= [ 'like', '%' + search_term + '%' ];
-		new_params.include='EVT_ID, EVT_name, Datetime.DTT_name, Datetime.DTT_EVT_start, Datetime.DTT_EVT_end, Datetime.DTT_is_primary, Datetime.DTT_reg_limit, Datetime.DTT_sold';
+		new_params.where.EVT_name = [ 'like', '%' + search_term + '%' ];
+		new_params.include = 'EVT_ID, EVT_name, Datetime.DTT_name,' +
+			' Datetime.DTT_EVT_start, Datetime.DTT_EVT_end,' +
+			' Datetime.DTT_is_primary, Datetime.DTT_reg_limit,' +
+			' Datetime.DTT_sold';
 		new_params._wpnonce = this.nonce;
-		// console_log_object( 'new_params', new_params, 0 );
 		return new_params;
 	};
 
@@ -38,74 +45,91 @@ function EE_Attendee_Mover_Event_Select2( data_interface_args ) {
 	 * @returns void
 	 */
 	this.beforeSend = function( xhr ) {
-		 xhr.setRequestHeader( 'X-WP-Nonce', this.nonce );
+		xhr.setRequestHeader( 'X-WP-Nonce', this.nonce );
 	};
 
 	/**
-	 * Takes incoming EE4 REST API response and turns into a data format select2 can handle
+	 * @param {moment} startDate
+	 * @param {moment} endDate
+	 * @returns {boolean}
+	 */
+	this.isActive = function( startDate, endDate ) {
+		return startDate.diff( this.now, 'seconds' ) < 0 &&
+			endDate.diff( this.now, 'seconds' ) > 0;
+	};
+
+	/**
+	 * @param {moment} startDate
+	 * @returns {boolean}
+	 */
+	this.isUpcoming = function( startDate ) {
+		return startDate.diff( this.now, 'seconds' ) > 0;
+	};
+
+	/**
+	 * Takes incoming EE4 REST API response
+	 * and turns into a data format select2 can handle
+	 *
 	 * @param {object} data
 	 * @param {object} params
 	 * @returns object
 	 */
-	this.processResults = function ( data, params ){
-		// console_log( 'processResults', '', true );
-		// console_log_object( 'data', data, 0 );
-		// console_log_object( 'params', params, 0 );
+	this.processResults = function( data, params ) {
+		var event = null;
+		var event_date = null;
+		var start_date = null;
+		var end_date = null;
 		var formatted_results = [];
-		for( var i=0; i<data.length; i++ ) {
-			//find the primary datetime's name
-			var preferred_datetime_text = '';
-			var secs       = 0;
-			var start_date = null;
-			var start_date_string = '';
-			var end_date = null;
-			var end_date_string = '';
-			var reg_limit = 999999;
-			var sold = 0;
-			moment.locale( this.locale );
-
-			for( var j=0; j<data[i].datetimes.length; j++) {
-				if( data[i].datetimes[j].DTT_is_primary || preferred_datetime_text == '' ) {
-					if( data[i].datetimes[j].DTT_name !== '' ) {
-						preferred_datetime_text = data[ i ].datetimes[ j ].DTT_name + ' ';
+		var option_text = '';
+		var datetime_details = '';
+		moment.locale( this.locale );
+		for ( var i = 0; i < data.length; i++ ) {
+			event = data[ i ];
+			option_text = '';
+			datetime_details = '';
+			for ( var j = 0; j < event.datetimes.length; j++ ) {
+				event_date = event.datetimes[ j ];
+				start_date = moment( event_date.DTT_EVT_start, this.ISO_8601 );
+				end_date = moment( event_date.DTT_EVT_end, this.ISO_8601 );
+				if (
+					datetime_details === '' &&
+					(
+						this.isActive( start_date, end_date ) ||
+						this.isUpcoming( start_date )
+					)
+				) {
+					if ( event_date.DTT_name !== '' ) {
+						datetime_details = event_date.DTT_name + ' •• ';
 					}
-					// console_log_object( 'DTT_EVT_start', data[ i ].datetimes[ j ].DTT_EVT_start, 0 );
-					// console_log_object( 'DTT_EVT_end', data[ i ].datetimes[ j ].DTT_EVT_end, 0 );
-					secs = Date.parse( data[i].datetimes[j].DTT_EVT_start );
-					// start date
-					start_date        = moment( new Date( secs ) );
-					start_date_string = start_date.format( "MMM DD YYYY" );
-					preferred_datetime_text += start_date_string;
-					// end date
-					secs     = Date.parse( data[ i ].datetimes[ j ].DTT_EVT_end );
-					end_date        = moment( new Date( secs ) );
-					end_date_string = end_date.format( "MMM DD YYYY" );
-					if ( end_date_string !== start_date_string ) {
-						preferred_datetime_text += ' - ' + end_date_string;
+					datetime_details += start_date.format( 'MMM DD YYYY' );
+					if ( start_date.diff( end_date, 'seconds' ) !== 0 ) {
+						datetime_details += ' - ' +
+							end_date.format( 'MMM DD YYYY' );
 					}
-					reg_limit = parseInt( data[ i ].datetimes[ j ].DTT_reg_limit  );
-					sold = parseInt( data[ i ].datetimes[ j ].DTT_sold  );
-					if ( reg_limit <= sold ) {
-						preferred_datetime_text += ' - ' + eei18n.attendee_mover_sold_out_datetime;
+					if (
+						parseInt( event_date.DTT_reg_limit, 10 )
+						<= parseInt( event_date.DTT_sold, 10 )
+					) {
+						datetime_details += ' •• ' + this.sold_out_notice;
 					}
-
 				}
 			}
+			option_text = '# ' + event.EVT_ID + ' •• ';
+			option_text += event.EVT_name + ' •• ' + datetime_details;
 			formatted_results.push(
 				{
-					id: data[i]['EVT_ID'],
-					text: '#' + data[i]['EVT_ID'] + ' | ' + data[i]['EVT_name'] + ' : ' + preferred_datetime_text
-				}
+					id: event.EVT_ID,
+					text: option_text,
+				},
 			);
 		}
 		params.page = params.page || 1;
-
 		return {
-		  results: formatted_results,
-		  pagination: {
-			more: data.length == this.items_per_page
-		  }
-		}
+			results: formatted_results,
+			pagination: {
+				more: data.length === this.items_per_page,
+			},
+		};
 	};
 }
 

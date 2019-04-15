@@ -1,14 +1,20 @@
 <?php
 namespace EventEspresso\AttendeeMover\form;
 
+use DomainException;
 use EE_Form_Section_Proper;
 use EE_Error;
+use EE_Registry;
+use EE_Select_Ajax_Model_Rest_Input;
+use EEM_Base;
+use EEM_Datetime;
 use EventEspresso\core\libraries\form_sections\form_handlers\FormHandler;
 use EventEspresso\core\libraries\form_sections\form_handlers\SequentialStepForm;
 use LogicException;
 use InvalidArgumentException;
 use EventEspresso\core\exceptions\InvalidDataTypeException;
 use EventEspresso\core\exceptions\InvalidFormSubmissionException;
+use ReflectionException;
 
 /**
  * Class SelectEvent
@@ -24,12 +30,14 @@ class SelectEvent extends Step
     /**
      * SelectEvent constructor
      *
-     * @param \EE_Registry $registry
-     * @throws InvalidDataTypeException
+     * @param EE_Registry $registry
+     * @throws DomainException
+     * @throws EE_Error
      * @throws InvalidArgumentException
-     * @throws \DomainException
+     * @throws InvalidDataTypeException
+     * @throws ReflectionException
      */
-    public function __construct(\EE_Registry $registry)
+    public function __construct(EE_Registry $registry)
     {
         parent::__construct(
             1,
@@ -57,11 +65,11 @@ class SelectEvent extends Step
     public function generate()
     {
         $this->setForm(
-            new \EE_Form_Section_Proper(
+            new EE_Form_Section_Proper(
                 array(
                     'name'        => $this->slug(),
                     'subsections' => array(
-                        'EVT_ID' => new \EE_Select_Ajax_Model_Rest_Input(
+                        'EVT_ID' => new EE_Select_Ajax_Model_Rest_Input(
                             array(
                                 'html_name'          => 'ee-select2-' . $this->slug(),
                                 'html_id'            => 'ee-select2-' . $this->slug(),
@@ -75,12 +83,13 @@ class SelectEvent extends Step
                                         array(
                                             'Datetime.DTT_EVT_end' => array(
                                                 '>',
-                                                \EEM_Datetime::instance()->current_time_for_query('DTT_EVT_end'),
+                                                EEM_Datetime::instance()->current_time_for_query('DTT_EVT_end'),
                                             ),
                                         )
                                     ),
                                     'limit' => 10,
-                                    'caps'  => \EEM_Base::caps_read_admin,
+                                    'caps'  => EEM_Base::caps_read_admin,
+                                    'order_by' => array('Datetime.DTT_EVT_start' => 'ASC')
                                 ),
                                 'required'           => true,
                                 'select2_args'       => array(
@@ -108,7 +117,7 @@ class SelectEvent extends Step
      *
      * @return void
      * @throws LogicException
-     * @throws \EE_Error
+     * @throws EE_Error
      */
     public function enqueueStylesAndScripts()
     {
@@ -133,8 +142,8 @@ class SelectEvent extends Step
             EE_ATTENDEE_MOVER_VERSION,
             true
         );
-        \EE_Registry::$i18n_js_strings['attendee_mover_sold_out_datetime'] = esc_html__('sold out', 'event_espresso');
-        $this->form(false)->enqueue_js();
+        EE_Registry::$i18n_js_strings['attendee_mover_sold_out_datetime'] = esc_html__('sold out', 'event_espresso');
+        $this->form()->enqueue_js();
     }
 
 
