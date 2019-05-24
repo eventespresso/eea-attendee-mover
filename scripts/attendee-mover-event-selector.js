@@ -26,7 +26,7 @@ function EE_Attendee_Mover_Event_Select2( data_interface_args ) {
 			( params.page - 1 ) * this.items_per_page,
 			this.items_per_page,
 		];
-		if ( typeof new_params.where === 'undefined' ) {
+		if( typeof new_params.where === 'undefined' || new_params.where.length === 0 ) {
 			new_params.where = {};
 		}
 		var search_term = params.term || '';
