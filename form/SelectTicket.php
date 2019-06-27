@@ -157,7 +157,7 @@ class SelectTicket extends Step
                 $existing_ticket_ID = $registration->ticket_ID();
                 if ($TKT_ID === $existing_ticket_ID) {
                     throw new InvalidFormSubmissionException(
-                        $this->form_name,
+                        $this->form()->name(),
                         esc_html__(
                             'Registrations can not be moved if you select the exact same ticket that the registration already has! Please select a different ticket.',
                             'event_espresso'
