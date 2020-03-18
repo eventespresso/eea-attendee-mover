@@ -7,6 +7,7 @@ use EE_Error;
 use EE_Form_Section_HTML;
 use EE_Form_Section_Proper;
 use EE_Registry;
+use EEM_Line_Item;
 use EventEspresso\core\exceptions\EntityNotFoundException;
 use EventEspresso\core\exceptions\InvalidFormSubmissionException;
 use EventEspresso\core\libraries\form_sections\form_handlers\FormHandler;
@@ -86,97 +87,128 @@ class VerifyChanges extends Step
         $th4 = esc_html__('New Event', 'event_espresso');
         $th5 = esc_html__('New Ticket', 'event_espresso');
         $th6 = esc_html__('Price Change', 'event_espresso');
-        $this->setForm(
-            new \EE_Form_Section_Proper(
-                array(
-                    'name'            => $this->slug(),
-                    'layout_strategy' => new \EE_Div_Per_Section_Layout(),
-                    'subsections'     => array(
-                        'changes'                     => new EE_Form_Section_HTML(
-                            \EEH_HTML::table(
-                                \EEH_HTML::thead(
-                                    \EEH_HTML::tr(
-                                        // \EEH_HTML::th( $th1 ) .
-                                        \EEH_HTML::th($th2) .
-                                        \EEH_HTML::th($th3) .
-                                        \EEH_HTML::th($th4) .
-                                        \EEH_HTML::th($th5) .
-                                        \EEH_HTML::th($th6)
+        $form = new \EE_Form_Section_Proper(
+            array(
+                'name'            => $this->slug(),
+                'layout_strategy' => new \EE_Div_Per_Section_Layout(),
+                'subsections'     => array(
+                    'changes'                     => new EE_Form_Section_HTML(
+                        \EEH_HTML::table(
+                            \EEH_HTML::thead(
+                                \EEH_HTML::tr(
+                                    // \EEH_HTML::th( $th1 ) .
+                                    \EEH_HTML::th($th2) .
+                                    \EEH_HTML::th($th3) .
+                                    \EEH_HTML::th($th4) .
+                                    \EEH_HTML::th($th5) .
+                                    \EEH_HTML::th($th6)
+                                )
+                            ) .
+                            \EEH_HTML::tbody(
+                                \EEH_HTML::tr(
+                                    \EEH_HTML::td(
+                                        $old_event_name,
+                                        '',
+                                        'am-old-event-name-td',
+                                        '',
+                                        'data-th="' . $th2 . '"'
+                                    ) .
+                                    \EEH_HTML::td(
+                                        $old_ticket_name_and_info,
+                                        '',
+                                        'am-old-ticket-name-td',
+                                        '',
+                                        'data-th="' . $th3 . '"'
+                                    ) .
+                                    \EEH_HTML::td(
+                                        $new_event_name,
+                                        '',
+                                        'am-new-event-name-td',
+                                        '',
+                                        'data-th="' . $th4 . '"'
+                                    ) .
+                                    \EEH_HTML::td(
+                                        $new_ticket->name_and_info(),
+                                        '',
+                                        'am-new-ticket-name-td',
+                                        '',
+                                        'data-th="' . $th5 . '"'
+                                    ) .
+                                    \EEH_HTML::td(
+                                        \EEH_Template::format_currency($price_change),
+                                        '',
+                                        'am-price-change-td jst-rght' . $price_class,
+                                        '',
+                                        'data-th="' . $th6 . '"'
                                     )
-                                ) .
-                                \EEH_HTML::tbody(
-                                    \EEH_HTML::tr(
-                                        \EEH_HTML::td(
-                                            $old_event_name,
-                                            '',
-                                            'am-old-event-name-td',
-                                            '',
-                                            'data-th="' . $th2 . '"'
-                                        ) .
-                                        \EEH_HTML::td(
-                                            $old_ticket_name_and_info,
-                                            '',
-                                            'am-old-ticket-name-td',
-                                            '',
-                                            'data-th="' . $th3 . '"'
-                                        ) .
-                                        \EEH_HTML::td(
-                                            $new_event_name,
-                                            '',
-                                            'am-new-event-name-td',
-                                            '',
-                                            'data-th="' . $th4 . '"'
-                                        ) .
-                                        \EEH_HTML::td(
-                                            $new_ticket->name_and_info(),
-                                            '',
-                                            'am-new-ticket-name-td',
-                                            '',
-                                            'data-th="' . $th5 . '"'
-                                        ) .
-                                        \EEH_HTML::td(
-                                            \EEH_Template::format_currency($price_change),
-                                            '',
-                                            'am-price-change-td jst-rght' . $price_class,
-                                            '',
-                                            'data-th="' . $th6 . '"'
-                                        )
-                                    )
-                                ),
-                                'eea-attendee-mover-info-table-' . $this->slug(),
-                                'eea-attendee-mover-info-table ee-responsive-table'
-                            )
-                        ),
-                        'notifications'               => new \EE_Form_Section_Proper(
-                            array(
-                                'layout_strategy' => new \EE_Admin_Two_Column_Layout(),
-                                'subsections'     => array(
-                                    'trigger_send' => new \EE_Yes_No_Input(
-                                        array(
-                                            'html_label_text' => esc_html__('Trigger Notifications?', 'event_espresso'),
-                                            'html_help_text'  => esc_html__(
-                                                'If "Yes" is selected, then notifications regarding these changes will be sent to the registration\'s contact (for example: Registration Approved (Event Admin context) + Registration Approved (Primary Registrant context), etc).',
-                                                'event_espresso'
-                                            ),
-                                        )
-                                    ),
-                                    '1'            => new EE_Form_Section_HTML(\EEH_HTML::br()),
-                                ),
-                            )
-                        ),
-                        $this->slug() . '-submit-btn' => $this->generateSubmitButton(),
-                        $this->slug() . '-cancel-btn' => $this->generateCancelButton(),
-                        '2'                           => new EE_Form_Section_HTML(\EEH_HTML::br(2)),
-                        'EVT_ID'                      => new \EE_Fixed_Hidden_Input(
-                            array('default' => $this->getEventId())
-                        ),
-                        'TKT_ID'                      => new \EE_Fixed_Hidden_Input(
-                            array('default' => $this->getTicketId())
-                        ),
+                                )
+                            ),
+                            'eea-attendee-mover-info-table-' . $this->slug(),
+                            'eea-attendee-mover-info-table ee-responsive-table'
+                        )
                     ),
-                )
+                    'notifications'               => new \EE_Form_Section_Proper(
+                        array(
+                            'layout_strategy' => new \EE_Admin_Two_Column_Layout(),
+                            'subsections'     => array(
+                                'trigger_send' => new \EE_Yes_No_Input(
+                                    array(
+                                        'html_label_text' => esc_html__('Trigger Notifications?', 'event_espresso'),
+                                        'html_help_text'  => esc_html__(
+                                            'If "Yes" is selected, then notifications regarding these changes will be sent to the registration\'s contact (for example: Registration Approved (Event Admin context) + Registration Approved (Primary Registrant context), etc).',
+                                            'event_espresso'
+                                        ),
+                                    )
+                                ),
+                                '1'            => new EE_Form_Section_HTML(\EEH_HTML::br()),
+                            ),
+                        )
+                    ),
+                    $this->slug() . '-submit-btn' => $this->generateSubmitButton(),
+                    $this->slug() . '-cancel-btn' => $this->generateCancelButton(),
+                    '2'                           => new EE_Form_Section_HTML(\EEH_HTML::br(2)),
+                    'EVT_ID'                      => new \EE_Fixed_Hidden_Input(
+                        array('default' => $this->getEventId())
+                    ),
+                    'TKT_ID'                      => new \EE_Fixed_Hidden_Input(
+                        array('default' => $this->getTicketId())
+                    ),
+                ),
             )
         );
+
+        $line_items_where = array(
+            'TXN_ID'     => $registration->transaction_ID(),
+            'OBJ_type'   => EEM_Line_Item::OBJ_TYPE_PROMOTION,
+        );
+        if (EEM_Line_Item::instance()->exists(array($line_items_where))
+            && class_exists('EED_Promotions')
+        ) {
+            $form->add_subsections(
+                array(
+                    'promotions'               => new \EE_Form_Section_Proper(
+                        array(
+                            'layout_strategy' => new \EE_Admin_Two_Column_Layout(),
+                            'subsections'     => array(
+                                'copy_promotions' => new \EE_Yes_No_Input(
+                                    array(
+                                        'html_label_text' => esc_html__('Re-apply Promotions?', 'event_espresso'),
+                                        'html_help_text'  => esc_html__(
+                                            'If "Yes" is selected, then any applicible promotions applied to the transaction will be copied to include the new registration.',
+                                            'event_espresso'
+                                        ),
+                                    )
+                                ),
+                                '1'            => new EE_Form_Section_HTML(\EEH_HTML::br()),
+                            ),
+                        )
+                    )
+                ),
+                'notifications',
+                false
+            );
+        }
+        $this->setForm($form);
         return $this->form();
     }
 
