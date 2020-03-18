@@ -229,7 +229,19 @@ class VerifyChanges extends Step
         } else {
             add_filter('FHEE__EED_Messages___maybe_registration__deliver_notifications', '__return_false', 15);
         }
-        $this->addRedirectArgs(array('ee-notify' => $this->notify));
+
+        if (isset($valid_data['promotions'], $valid_data['promotions']['copy_promotions'])
+            && $valid_data['promotions']['copy_promotions'] === true
+        ) {
+            // Copy promotions
+            $this->setCopyPromos();
+        }
+        $this->addRedirectArgs(
+            array(
+                'ee-notify' => $this->notify,
+                'ee-copy-promos' => $this->copyPromos
+            )
+        );
         $this->setRedirectTo(SequentialStepForm::REDIRECT_TO_NEXT_STEP);
         return true;
     }
