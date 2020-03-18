@@ -120,6 +120,11 @@ class MoveAttendeeCommandHandler extends CommandHandler
         $this->copy_registration_service->copyPaymentDetails($new_registration, $old_registration);
         // and additional data from old registration, like reg form question answers
         $this->copy_registration_service->copyRegistrationDetails($new_registration, $old_registration);
+        // copy promotion line items if requested
+        if ($command->copyPromotions()) {
+            // move/copy over promotion line items
+            $this->copy_registration_service->copyPromotionLineItems($new_registration, $old_registration);
+        }
         // now cancel original registration and it's ticket line item
         $this->cancel_registration_service->cancelRegistrationAndTicketLineItem($old_registration, false);
         // manually increment ticket sold count for new ticket if registration is approved
