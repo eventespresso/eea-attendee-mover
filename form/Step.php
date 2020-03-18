@@ -55,6 +55,10 @@ abstract class Step extends SequentialStepForm
      */
     protected $notify;
 
+    /**
+     * @var bool $copyPromos
+     */
+    protected $copyPromos;
 
     /**
      * SequentialStepForm constructor
@@ -94,12 +98,14 @@ abstract class Step extends SequentialStepForm
         $this->EVT_ID = $this->getEventId();
         $this->TKT_ID = $this->getTicketId();
         $this->notify = $this->getNotify();
+        $this->copyPromos = $this->getCopyPromos();
         $this->addRedirectArgs(
             array(
                 '_REG_ID'   => $this->REG_ID,
                 'EVT_ID'    => $this->EVT_ID,
                 'TKT_ID'    => $this->TKT_ID,
                 'ee-notify' => $this->notify,
+                'ee-copy-promos' => $this->copyPromos,
             )
         );
         $this->addFormActionArgs(
@@ -108,6 +114,7 @@ abstract class Step extends SequentialStepForm
                 'EVT_ID'    => $this->EVT_ID,
                 'TKT_ID'    => $this->TKT_ID,
                 'ee-notify' => $this->notify,
+                'ee-copy-promos' => $this->copyPromos,
             )
         );
     }
@@ -238,6 +245,37 @@ abstract class Step extends SequentialStepForm
     public function setNotify($notify = true)
     {
         $this->notify = filter_var($notify, FILTER_VALIDATE_BOOLEAN);
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function copyPromos()
+    {
+        return $this->copyPromos;
+    }
+
+
+    /**
+     * @return bool
+     * @throws ReflectionException
+     * @throws EE_Error
+     */
+    public function getCopyPromos()
+    {
+        $request = $this->registry->load_core('Request');
+        $this->setCopyPromos($request->get('ee-copy-promos', false));
+        return $this->copyPromos;
+    }
+
+
+    /**
+     * @param bool $notify
+     */
+    public function setCopyPromos($copyPromos = true)
+    {
+        $this->copyPromos = filter_var($copyPromos, FILTER_VALIDATE_BOOLEAN);
     }
 
 
