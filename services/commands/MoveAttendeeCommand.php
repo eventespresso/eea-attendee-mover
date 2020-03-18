@@ -49,11 +49,13 @@ class MoveAttendeeCommand extends Command implements CommandRequiresCapCheckInte
     public function __construct(
         EE_Registration $old_registration,
         EE_Ticket $new_ticket,
-        $trigger_notifications
+        $trigger_notifications,
+        $copy_promotions
     ) {
         $this->registration = $old_registration;
         $this->ticket = $new_ticket;
         $this->trigger_notifications = filter_var($trigger_notifications, FILTER_VALIDATE_BOOLEAN);
+        $this->copy_promotions = filter_var($copy_promotions, FILTER_VALIDATE_BOOLEAN);
     }
 
 
@@ -96,5 +98,14 @@ class MoveAttendeeCommand extends Command implements CommandRequiresCapCheckInte
     public function triggerNotifications()
     {
         return $this->trigger_notifications;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function copyPromotions()
+    {
+        return $this->copy_promotions;
     }
 }
