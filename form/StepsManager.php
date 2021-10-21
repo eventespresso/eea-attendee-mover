@@ -13,6 +13,7 @@ use EventEspresso\core\libraries\form_sections\form_handlers\SequentialStepFormM
 use EventEspresso\core\services\collections\Collection;
 use EventEspresso\core\services\collections\CollectionDetails;
 use EventEspresso\core\services\collections\CollectionLoader;
+use EventEspresso\core\services\request\RequestInterface;
 use InvalidArgumentException;
 
 /**
@@ -35,7 +36,7 @@ class StepsManager extends SequentialStepFormManager
      * @param string      $form_action
      * @param string      $form_config
      * @param string      $progress_step_style
-     * @param \EE_Request $request
+     * @param RequestInterface $request
      * @throws InvalidDataTypeException
      * @throws InvalidArgumentException
      */
@@ -45,7 +46,7 @@ class StepsManager extends SequentialStepFormManager
         $form_action = '',
         $form_config = FormHandler::ADD_FORM_TAGS_AND_SUBMIT,
         $progress_step_style = 'number_bubbles',
-        \EE_Request $request = null
+        RequestInterface $request = null
     ) {
         parent::__construct(
             $base_url,
@@ -59,7 +60,7 @@ class StepsManager extends SequentialStepFormManager
 
 
     /**
-     * @return Collection|null
+     * @return Step[]|Collection|null
      * @throws InvalidEntityException
      * @throws InvalidIdentifierException
      * @throws InvalidInterfaceException
