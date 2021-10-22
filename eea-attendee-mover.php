@@ -37,7 +37,7 @@
  * ------------------------------------------------------------------------
  */
 // define versions and this file
-define('EE_ATTENDEE_MOVER_CORE_VERSION_REQUIRED', '4.9.13.rc.006');
+define('EE_ATTENDEE_MOVER_CORE_VERSION_REQUIRED', '4.10.14.p');
 define('EE_ATTENDEE_MOVER_WP_VERSION_REQUIRED', '4.4.0');
 define('EE_ATTENDEE_MOVER_VERSION', '1.0.6.rc.000');
 define('EE_ATTENDEE_MOVER_PLUGIN_FILE', __FILE__);
