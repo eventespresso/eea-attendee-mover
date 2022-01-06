@@ -15,6 +15,8 @@ use EventEspresso\core\exceptions\InvalidEntityException;
 use EventEspresso\core\exceptions\UnexpectedEntityException;
 use EventEspresso\core\services\commands\CommandHandler;
 use EventEspresso\core\services\commands\CommandInterface;
+use EventEspresso\core\services\loaders\LoaderFactory;
+use EventEspresso\core\services\request\RequestInterface;
 use OutOfRangeException;
 use RuntimeException;
 
@@ -128,7 +130,8 @@ class MoveAttendeeCommandHandler extends CommandHandler
             $new_ticket->save();
         }
         // bamboozle EED_Messages into sending notifications by tweaking the request vars
-        $_REQUEST['txn_reg_status_change']['send_notifications'] = (int) $command->triggerNotifications();
+        $request = LoaderFactory::getLoader()->getShared('EventEspresso\core\services\request\Request');
+        $request->setRequestParam('txn_reg_status_change', array('send_notifications' => (int) $command->triggerNotifications()));
         // perform final status updates and trigger notifications
         $this->update_registration_service->updateRegistrationAndTransaction($command->registration());
         // tag registrations for identification purposes
