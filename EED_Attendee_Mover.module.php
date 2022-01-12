@@ -113,7 +113,7 @@ class EED_Attendee_Mover extends EED_Module
      *
      * @param array                    $page_routes
      * @param Registrations_Admin_Page $admin_page
-     * @return mixed
+     * @return array
      */
     public static function attendee_mover_page_routes(array $page_routes, Registrations_Admin_Page $admin_page)
     {
@@ -209,15 +209,16 @@ class EED_Attendee_Mover extends EED_Module
      * @param array           $actions
      * @param EE_Registration $registration
      * @return array
-     * @throws \ReflectionException
-     * @throws \EventEspresso\core\exceptions\InvalidInterfaceException
-     * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
+     * @throws ReflectionException
+     * @throws InvalidInterfaceException
+     * @throws InvalidDataTypeException
      * @throws InvalidArgumentException
      * @throws EE_Error
      */
-    public static function edit_attendee_selections_button_reg_list(array $actions = array(), EE_Registration
-    $registration)
-    {
+    public static function edit_attendee_selections_button_reg_list(
+        array $actions,
+        EE_Registration $registration
+    ) {
         if (! in_array(
             $registration->status_ID(),
             array(
@@ -244,8 +245,8 @@ class EED_Attendee_Mover extends EED_Module
      * @param bool $button
      * @param bool $echo
      * @return string
-     * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
-     * @throws \EventEspresso\core\exceptions\InvalidInterfaceException
+     * @throws InvalidDataTypeException
+     * @throws InvalidInterfaceException
      * @throws InvalidArgumentException
      */
     public static function edit_attendee_selections_button($REG_ID = 0, $button = true, $echo = true)
@@ -337,10 +338,10 @@ class EED_Attendee_Mover extends EED_Module
 
     /**
      * @param $REG_ID
-     * @throws \ReflectionException
-     * @throws \InvalidArgumentException
-     * @throws \EventEspresso\core\exceptions\InvalidInterfaceException
-     * @throws \EventEspresso\core\exceptions\InvalidDataTypeException
+     * @throws ReflectionException
+     * @throws InvalidArgumentException
+     * @throws InvalidInterfaceException
+     * @throws InvalidDataTypeException
      * @throws EE_Error
      */
     public static function registration_moved_notice($REG_ID)
@@ -398,8 +399,9 @@ class EED_Attendee_Mover extends EED_Module
         if (! $form_steps_manager instanceof StepsManager) {
             /** @var EventEspresso\core\services\loaders\Loader $loader */
             $loader             = LoaderFactory::getLoader();
-            $request            = $loader->getShared('EE_Request');
-            $REG_ID             = absint($request->get('_REG_ID', 0));
+            /** @var EventEspresso\core\services\request\RequestInterface $request */
+            $request            = $loader->getShared('EventEspresso\core\services\request\RequestInterface');
+            $REG_ID             = $request->getRequestParam('_REG_ID', 0, 'int');
             $form_steps_manager = $loader->getShared(
                 'EventEspresso\AttendeeMover\form\StepsManager',
                 array(
@@ -444,8 +446,8 @@ class EED_Attendee_Mover extends EED_Module
     /**
      * callback that displays the page template
      *
-     * @throws \EE_Error
-     * @throws \DomainException
+     * @throws EE_Error
+     * @throws DomainException
      */
     public static function edit_attendee_selections()
     {
@@ -475,7 +477,6 @@ class EED_Attendee_Mover extends EED_Module
         try {
             $form_steps_manager = $this->get_form_steps_manager();
             echo $form_steps_manager->displayProgressSteps();
-            // echo \EEH_HTML::h1( $form_steps_manager->getCurrentStep()->formName() );
             echo $form_steps_manager->displayCurrentStepForm();
         } catch (Exception $e) {
             new ExceptionStackTraceDisplay($e);

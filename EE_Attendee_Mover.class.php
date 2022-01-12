@@ -67,7 +67,7 @@ class EE_Attendee_Mover extends EE_Addon
                 null,
                 null,
                 null,
-                'EE_Request' => EE_Dependency_Map::load_from_cache,
+                'EventEspresso\core\services\request\RequestInterface' => EE_Dependency_Map::load_from_cache,
             ),
             'EventEspresso\AttendeeMover\form\SelectEvent'                             => array(
                 'EE_Registry' => EE_Dependency_Map::load_from_cache,
