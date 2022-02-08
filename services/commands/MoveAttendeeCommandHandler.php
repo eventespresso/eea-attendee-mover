@@ -132,6 +132,7 @@ class MoveAttendeeCommandHandler extends CommandHandler
         // bamboozle EED_Messages into sending notifications by tweaking the request vars
         $request = LoaderFactory::getLoader()->getShared('EventEspresso\core\services\request\Request');
         $request->setRequestParam('txn_reg_status_change', ['send_notifications' => (int) $command->triggerNotifications()]);
+        $request->setRequestParam('non_primary_reg_notification', 1);
         // perform final status updates and trigger notifications
         $this->update_registration_service->updateRegistrationAndTransaction($command->registration());
         // tag registrations for identification purposes
