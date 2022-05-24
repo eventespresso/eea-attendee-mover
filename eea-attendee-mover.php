@@ -67,9 +67,17 @@ add_action('activated_plugin', 'espresso_attendee_mover_plugin_activation_errors
 function load_espresso_attendee_mover()
 {
     if (class_exists('EE_Addon')) {
-        // attendee_mover version
-        require_once(plugin_dir_path(__FILE__) . 'EE_Attendee_Mover.class.php');
-        EE_Attendee_Mover::register_addon();
+        /** @var EventEspresso\core\domain\Domain $core_domain */
+        $core_domain = EventEspresso\core\services\loaders\LoaderFactory::getLoader()->getShared(
+            EventEspresso\core\domain\Domain::class
+        );
+        if ($core_domain instanceof EventEspresso\core\domain\Domain && $core_domain->isCaffeinated()) {
+            // attendee_mover version
+            require_once(plugin_dir_path(__FILE__) . 'EE_Attendee_Mover.class.php');
+            EE_Attendee_Mover::register_addon();
+        } else {
+            add_action('admin_notices', 'espresso_attendee_mover_activation_error');
+        }
     } else {
         add_action('admin_notices', 'espresso_attendee_mover_activation_error');
     }
