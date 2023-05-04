@@ -98,7 +98,7 @@ class MoveAttendeeCommandHandler extends CommandHandler
     public function handle(CommandInterface $command)
     {
         /** @var MoveAttendeeCommand $command */
-        if (! $command instanceof MoveAttendeeCommand) {
+        if (!$command instanceof MoveAttendeeCommand) {
             throw new InvalidEntityException(get_class($command), 'MoveAttendeeCommand');
         }
         $old_registration = $command->registration();
@@ -137,6 +137,14 @@ class MoveAttendeeCommandHandler extends CommandHandler
         $this->update_registration_service->updateRegistrationAndTransaction($command->registration());
         // tag registrations for identification purposes
         $this->addExtraMeta($old_registration, $new_registration, $new_ticket);
+
+        // hook to allow other addons to do stuff with the new registration
+        do_action(
+            'AHEE__MoveAttendeeCommandHandler__handle__after',
+            $new_registration,
+            $old_registration,
+            $new_ticket
+        );
         return $new_registration;
     }
 
